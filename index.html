@@ -465,6 +465,15 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 .rate-row{display:grid;grid-template-columns:auto 1fr 120px;gap:12px;align-items:center;padding:10px 0}
 .rate-row + .rate-row{border-top:1px solid var(--border)}
 .rate-row .input{height:42px;font-size:15px;padding:0 14px;text-align:right}
+.rate-meta{margin:2px 0 4px}
+.rate-meta div{padding:8px 2px;font-size:14px}
+.rate-status{min-height:20px;font-size:13px;font-weight:600;color:var(--accent-text);padding:2px 2px 6px}
+.rate-status:empty{display:none}
+.rate-status.bad{color:var(--danger)}
+.btn.spinning .ic{animation:spin .9s linear infinite}
+.btn[disabled]{opacity:.75;cursor:progress}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){ .btn.spinning .ic{animation:none !important} }
 .cur-tag{width:46px;height:30px;border-radius:15px;display:grid;place-items:center;font-size:12.5px;font-weight:700;background:var(--tile);border:1px solid var(--border)}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
 .swatches button{width:34px;height:34px;border-radius:17px;background:var(--c);border:2px solid transparent;transition:transform .4s var(--spring)}
@@ -744,26 +753,42 @@ function rate(cur) {
 }
 const toHUF = (amount, cur) => amount * rate(cur);
 let rateStatus = 'idle'; // idle | loading | ok | offline
+let rateResult = null;    // outcome of the last check: 'new' | 'same' | 'fail'
+// S.rates.date      = the date the rates were published for (the rate's own date)
+// S.rates.checkedAt = when the app last successfully asked the source
+// force = true (Refresh button): skip every cache and always ask the source again
 async function fetchRates(force = false) {
-  const age = Date.now() - (S.rates?.fetchedAt || 0);
+  const age = Date.now() - (S.rates?.checkedAt || S.rates?.fetchedAt || 0);
   if (!force && S.rates?.source === 'ecb' && age < 6 * 3600e3) { rateStatus = 'ok'; return false; }
   rateStatus = 'loading';
-  const q = 'from=EUR&to=HUF,USD,GBP,CHF,CZK,PLN,RON';
+  const q = `from=EUR&to=HUF,USD,GBP,CHF,CZK,PLN,RON&_=${Date.now()}`; // cache-buster
   const urls = [`https://api.frankfurter.dev/v1/latest?${q}`, `https://api.frankfurter.app/latest?${q}`];
+  const prev = S.rates || {};
   for (const u of urls) {
     try {
       const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
-      const res = await fetch(u, { signal: ctl.signal }); clearTimeout(t);
+      const res = await fetch(u, { signal: ctl.signal, cache: 'no-store' }); clearTimeout(t);
       if (!res.ok) continue;
       const j = await res.json();
       if (!j?.rates?.HUF) continue;
-      S.rates = { base: 'EUR', date: j.date, fetchedAt: Date.now(), source: 'ecb', rates: j.rates };
-      save(); rateStatus = 'ok'; return true;
+      const changed = prev.source !== 'ecb' || prev.date !== j.date || JSON.stringify(prev.rates) !== JSON.stringify(j.rates);
+      const now = Date.now();
+      S.rates = { base: 'EUR', date: j.date, fetchedAt: changed ? now : (prev.fetchedAt || now), checkedAt: now, source: 'ecb', rates: j.rates };
+      save(); rateStatus = 'ok';
+      rateResult = force ? (changed ? 'new' : 'same') : null; // only report on a manual refresh
+      return changed;
     } catch (e) { /* try next */ }
   }
-  rateStatus = 'offline';
+  rateStatus = 'offline'; rateResult = 'fail';
   return false;
 }
+function fmtCheckTime(ts) {
+  if (!ts) return 'még nem volt';
+  const d = new Date(ts), s = iso(d), hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const n = diffDays(s, today());
+  return n === 0 ? `ma ${hm}` : n === 1 ? `tegnap ${hm}` : `${fmtDate(s)} ${hm}`;
+}
+const fmtRateDate = s => `${fmtDate(s)}, ${weekday(s)}`;
 
 /* ---------- Recurring schedule ---------- */
 function stepDate(s, cycle, anchor) {
@@ -2378,8 +2403,14 @@ const SETC = { catKind: 'expense' };
 RENDER.settings = root => {
   const usedCur = [...new Set(['EUR', 'USD', ...S.accounts.map(a => a.currency).filter(c => c !== 'HUF')])];
   const rs = S.rates || {};
-  const srcL = rs.source === 'ecb' ? `Európai Központi Bank (Frankfurter) · ${fmtDate(rs.date)}` : 'Beépített becslés – még nem sikerült letölteni';
-  const stL = { loading: 'Frissítés…', offline: 'Offline – a legutóbb mentett árfolyamot használjuk', ok: '', idle: '' }[rateStatus];
+  const isEcb = rs.source === 'ecb';
+  const srcL = isEcb ? 'Forrás: Európai Központi Bank (Frankfurter API)' : 'Beépített becslés – még nem sikerült letölteni';
+  const loading = rateStatus === 'loading';
+  const stL = loading ? 'Frissítés…'
+    : rateResult === 'same' ? `Naprakész – a legfrissebb árfolyam dátuma: ${fmtRateDate(rs.date)}`
+    : rateResult === 'new' ? 'Új árfolyamok betöltve'
+    : rateResult === 'fail' ? 'Nem sikerült elérni a forrást, a legutóbb mentett árfolyamot használjuk'
+    : '';
   root.innerHTML = `
     <header class="page-h rise" style="--i:0"><div><h1>Beállítások</h1><div class="sub">Az adatok csak ebben a böngészőben tárolódnak</div></div></header>
     <div class="stack">
@@ -2393,10 +2424,15 @@ RENDER.settings = root => {
       ${segHTML('ckind', [['expense', 'Kiadás'], ['income', 'Bevétel']], SETC.catKind)}
       <div class="chips" id="catChips" style="margin-top:12px"></div></section>
 
-    <section class="glass card rise" style="--i:4"><div class="card-h"><div><div class="card-t">Árfolyamok</div><div class="card-s">${esc(srcL)}</div></div><button class="btn sm" id="rateRefresh">${icon('refresh-cw')}Frissítés</button></div>
-      ${stL ? `<div class="card-s" style="margin-bottom:6px;color:var(--accent-text)">${stL}</div>` : ''}
+    <section class="glass card rise" style="--i:4"><div class="card-h"><div><div class="card-t">Árfolyamok</div><div class="card-s">${esc(srcL)}</div></div><button class="btn sm ${loading ? 'spinning' : ''}" id="rateRefresh" ${loading ? 'disabled aria-busy="true"' : ''}>${icon('refresh-cw')}${loading ? 'Frissítés…' : 'Frissítés'}</button></div>
+      <div class="kv rate-meta">
+        <div><span>Árfolyam dátuma</span><b>${isEcb ? fmtRateDate(rs.date) : 'beépített becslés'}</b></div>
+        <div><span>Utolsó ellenőrzés</span><b>${fmtCheckTime(rs.checkedAt || (isEcb ? rs.fetchedAt : 0))}</b></div>
+      </div>
+      <div class="rate-status ${rateResult === 'fail' && !loading ? 'bad' : ''}" role="status" aria-live="polite">${stL ? esc(stL) : ''}</div>
       ${usedCur.map(c => `<div class="rate-row"><span class="cur-tag">${c}</span><div><div style="font-weight:600">1 ${c} = ${fmtNum(rate(c), 2)} Ft</div><div class="card-s">${S.rateOverrides[c] ? `Kézi érték · EKB: ${fmtNum(autoRate(c), 2)} Ft` : 'Automatikus (EKB)'}</div></div><input class="input" inputmode="decimal" data-ov="${c}" placeholder="Kézi" value="${S.rateOverrides[c] ? fmtNum(S.rateOverrides[c], 2) : ''}" aria-label="${c} kézi árfolyam"></div>`).join('')}
-      <div class="card-s" style="margin-top:8px">A kézi mező kitöltésével felülírhatod az árfolyamot; üresen hagyva az EKB napi árfolyama érvényes.</div></section>
+      <div class="card-s" style="margin-top:8px">A kézi mező kitöltésével felülírhatod az árfolyamot; üresen hagyva az EKB napi árfolyama érvényes.</div>
+      <div class="card-s" style="margin-top:6px">A jegybankok hétvégén és ünnepnapokon nem tesznek közzé árfolyamot – ilyenkor az utolsó munkanap árfolyama a legfrissebb. Az EKB munkanapokon kb. 16:00-kor (magyar idő) frissít.</div></section>
 
     <section class="glass card rise" style="--i:5"><div class="card-h"><div class="card-t">Adatok</div></div>
       <div class="btn-row">
@@ -2424,10 +2460,11 @@ RENDER.settings = root => {
   $('#accNew').onclick = () => openAccountSheet(null);
   $('#catNew').onclick = () => openCategorySheet(null);
   $('#rateRefresh').onclick = async () => {
+    if (rateStatus === 'loading') return;
     rateStatus = 'loading'; RENDER.settings($('#page'), false);
-    const ok = await fetchRates(true);
-    RENDER.settings($('#page'), false);
-    toast(ok ? 'Árfolyamok frissítve' : 'Nem sikerült letölteni – a mentett árfolyam marad');
+    const minSpin = new Promise(r => setTimeout(r, 450)); // keep the spinner visible long enough to notice
+    await Promise.all([fetchRates(true), minSpin]);
+    if (route === 'settings') RENDER.settings($('#page'), false);
   };
   $$('[data-ov]', root).forEach(inp => inp.onchange = () => {
     const v = parseAmount(inp.value); const c = inp.dataset.ov;
