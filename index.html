@@ -556,6 +556,68 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 .dialog p{color:var(--text2);font-size:14.5px;margin-bottom:18px}
 .dialog .btn-row .btn{flex:1}
 
+/* ---------- Account edit mode ---------- */
+.car-slot{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.acc-j{position:relative;will-change:transform,opacity}
+.acc-w{position:relative;transform-origin:50% 60%}
+.editing .acc-w{animation:jiggle var(--jd,.26s) ease-in-out var(--jdel,0s) infinite alternate}
+@keyframes jiggle{from{transform:rotate(calc(var(--jr,1.1deg) * -1))}to{transform:rotate(var(--jr,1.1deg))}}
+.car-slot.lifted{position:relative;z-index:5}
+.car-slot.lifted .acc-w{animation:none;transform:scale(1.06);transition:transform .35s var(--spring)}
+.car-slot.lifted .acc{box-shadow:var(--hl), 0 34px 50px -18px rgba(0,0,0,.85)}
+.acc-del{position:absolute;z-index:3;top:-9px;right:-5px;width:30px;height:30px;border-radius:15px;display:grid;place-items:center;
+  background:var(--bar-bg);border:1px solid var(--border-2);color:var(--text);box-shadow:var(--hl), 0 6px 16px -4px rgba(0,0,0,.6);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);
+  transform:scale(0);opacity:0;pointer-events:none;transition:transform .45s var(--spring), opacity .2s}
+.acc-del::before{content:"";position:absolute;inset:-9px}
+.acc-del .ic{width:16px;height:16px;stroke-width:3}
+.editing .acc-del{transform:scale(1);opacity:1;pointer-events:auto}
+.acc-add{width:100%;height:184px;border-radius:28px;border:1.5px dashed var(--border-2);background:rgba(255,255,255,.025);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);font-weight:600;font-size:15px}
+:root[data-theme="light"] .acc-add{background:rgba(255,255,255,.35)}
+.acc-add .plus{width:48px;height:48px;border-radius:24px;display:grid;place-items:center;background:var(--field);border:1px solid var(--border);box-shadow:var(--hl)}
+.edit-hint{text-align:center;font-size:12px;color:var(--text3);max-height:0;opacity:0;overflow:hidden;transition:opacity .3s}
+.editing .edit-hint{max-height:40px;opacity:1;margin-top:4px}
+.edit-done{position:fixed;z-index:45;top:calc(env(safe-area-inset-top) + 18px);right:16px;height:42px;padding:0 24px;border-radius:21px;
+  font-weight:700;font-size:15px;color:var(--text);background:var(--bar-bg);border:1px solid var(--border-2);box-shadow:var(--hl),0 12px 30px -10px rgba(0,0,0,.6);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  transform:translateY(-90px);transition:transform var(--spring-dur) var(--spring)}
+.edit-done.show{transform:none}
+.car-editing .dash-head .icon-btn{opacity:0;pointer-events:none;transition:opacity .2s}
+@media (min-width: 960px){ .edit-done{top:28px;right:max(32px, calc(100% - 268px - 1120px + 32px))} }
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-grid .chip{justify-content:flex-start}
+.type-note{display:block;font-size:12px;color:var(--text3);padding:0 6px}
+.type-note:empty{display:none}
+.acc-prev{height:164px;pointer-events:none}
+.btn.danger-o{color:var(--danger);border-color:rgba(255,138,128,.45);background:rgba(255,138,128,.07)}
+.btn.danger-fill{background:#d4483b;color:#fff;border:0;box-shadow:0 10px 24px -12px rgba(212,72,59,.8)}
+.rec-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:rgba(10,12,38,.16)}
+.del-card{display:flex;align-items:center;gap:12px;padding:16px;border-radius:24px;border:1px solid var(--border);box-shadow:var(--hl);
+  background:radial-gradient(120% 90% at 100% 0%, var(--ca), transparent 60%), linear-gradient(160deg,var(--g1),var(--g2))}
+.del-bal{font-size:18px}
+.del-note{font-size:14px;color:var(--text2);padding:0 4px}
+.del-foot{display:grid;gap:8px}
+.del-help{font-size:12.5px;color:var(--text3);padding:0 6px 4px}
+.del-confirm{display:grid;gap:4px;padding:14px 16px;border-radius:18px;background:rgba(255,138,128,.1);border:1px solid rgba(255,138,128,.32);font-size:14px}
+.del-confirm b{color:var(--danger);font-size:17px}
+/* sheet growing out of a card */
+.morph-src{opacity:0 !important;transition:none !important}
+.layer.morph .sheet > :not(.skin){position:relative}
+.skin{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+.skin-p{background:var(--panel-2);border:1px solid var(--border);border-bottom:0;box-shadow:var(--hl), 0 -20px 50px -20px rgba(0,0,0,.6);opacity:0;transition:opacity .22s ease}
+.skin-a{opacity:1;transition:opacity .34s ease .1s}
+.layer.morph .sheet{background:transparent;border-color:transparent;box-shadow:none}
+.layer.morph .sheet > :not(.skin){opacity:0;transition:opacity .2s ease}
+.layer.morph-in .skin-p{opacity:1}
+.layer.morph-in .skin-a{opacity:0}
+.layer.morph-in .sheet > :not(.skin){opacity:1;transition:opacity .3s ease .16s}
+.layer.morph-out .skin-p{opacity:1}
+.layer.morph-out .skin-a{opacity:1;transition:opacity .24s ease .1s}
+.layer.morph-out .sheet > :not(.skin){opacity:0;transition:opacity .14s ease}
+@media (min-width: 700px){ .skin-p{border-bottom:1px solid var(--border)} }
+@media (prefers-reduced-motion: reduce){ .editing .acc-w{animation:none !important} }
+
 /* ---------- Motion ---------- */
 .page-in{animation:pageIn .5s var(--ease-out) both}
 @keyframes pageIn{from{opacity:0;transform:translateY(10px)}}
@@ -595,7 +657,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 
 <script>
 /* Icons: Lucide (ISC license) */
-const ICONS={"shopping-cart":"<path d=\"m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18\" /> <path d=\"M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25\" /> <circle cx=\"18\" cy=\"20\" r=\"2\" /> <circle cx=\"8\" cy=\"20\" r=\"2\" />","utensils":"<path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\" /> <path d=\"M7 2v20\" /> <path d=\"M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7\" />","coffee":"<path d=\"M10 2v2\" /> <path d=\"M14 2v2\" /> <path d=\"M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1\" /> <path d=\"M6 2v2\" />","house":"<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />","bus":"<path d=\"M8 6v6\" /> <path d=\"M15 6v6\" /> <path d=\"M2 12h19.6\" /> <path d=\"M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3\" /> <circle cx=\"7\" cy=\"18\" r=\"2\" /> <path d=\"M9 18h5\" /> <circle cx=\"16\" cy=\"18\" r=\"2\" />","car":"<path d=\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\" /> <circle cx=\"7\" cy=\"17\" r=\"2\" /> <path d=\"M9 17h6\" /> <circle cx=\"17\" cy=\"17\" r=\"2\" />","repeat":"<path d=\"m17 2 4 4-4 4\" /> <path d=\"M3 11v-1a4 4 0 0 1 4-4h14\" /> <path d=\"m7 22-4-4 4-4\" /> <path d=\"M21 13v1a4 4 0 0 1-4 4H3\" />","plane":"<path d=\"M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z\" />","shopping-bag":"<path d=\"M16 10a4 4 0 0 1-8 0\" /> <path d=\"M3.103 6.034h17.794\" /> <path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\" />","heart-pulse":"<path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5\" /> <path d=\"M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27\" />","ellipsis":"<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />","briefcase":"<path d=\"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\" /> <rect width=\"20\" height=\"14\" x=\"2\" y=\"6\" rx=\"2\" />","laptop":"<path d=\"M18 5a2 2 0 0 1 2 2v8.526a2 2 0 0 0 .212.897l1.068 2.127a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45l1.068-2.127A2 2 0 0 0 4 15.526V7a2 2 0 0 1 2-2z\" /> <path d=\"M20.054 15.987H3.946\" />","piggy-bank":"<path d=\"M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z\" /> <path d=\"M16 10h.01\" /> <path d=\"M2 8v1a2 2 0 0 0 2 2h1\" />","coins":"<path d=\"M13.744 17.736a6 6 0 1 1-7.48-7.48\" /> <path d=\"M15 6h1v4\" /> <path d=\"m6.134 14.768.866-.5 2 3.464\" /> <circle cx=\"16\" cy=\"8\" r=\"6\" />","arrow-left-right":"<path d=\"M8 3 4 7l4 4\" /> <path d=\"M4 7h16\" /> <path d=\"m16 21 4-4-4-4\" /> <path d=\"M20 17H4\" />","layout-grid":"<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" />","list":"<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />","chart-column":"<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"M18 17V9\" /> <path d=\"M13 17V5\" /> <path d=\"M8 17v-3\" />","refresh-cw":"<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />","settings":"<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />","plus":"<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />","search":"<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />","x":"<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />","chevron-down":"<path d=\"m6 9 6 6 6-6\" />","chevron-right":"<path d=\"m9 18 6-6-6-6\" />","chevron-left":"<path d=\"m15 18-6-6 6-6\" />","trash-2":"<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />","pencil":"<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />","wallet":"<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\" /> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\" />","credit-card":"<rect width=\"20\" height=\"14\" x=\"2\" y=\"5\" rx=\"2\" /> <line x1=\"2\" x2=\"22\" y1=\"10\" y2=\"10\" /> <path d=\"M6 14h2\" />","banknote":"<rect width=\"20\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\" /> <circle cx=\"12\" cy=\"12\" r=\"2\" /> <path d=\"M6 12h.01M18 12h.01\" />","calendar":"<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />","sun":"<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />","moon":"<path d=\"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401\" />","download":"<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />","upload":"<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />","rotate-ccw":"<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />","pause":"<rect x=\"14\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" /> <rect x=\"5\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" />","play":"<path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\" />","ban":"<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M4.929 4.929 19.07 19.071\" />","sliders-horizontal":"<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />","check":"<path d=\"M20 6 9 17l-5-5\" />","music":"<path d=\"M21 16V3a1 1 0 0 0-1.28-.96l-10 2.917a1 1 0 0 0-.72.96V19\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" /> <circle cx=\"6\" cy=\"19\" r=\"3\" />","tv":"<path d=\"m17 2-5 5-5-5\" /> <rect width=\"20\" height=\"15\" x=\"2\" y=\"7\" rx=\"2\" />","film":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M7 3v18\" /> <path d=\"M3 7.5h4\" /> <path d=\"M3 12h18\" /> <path d=\"M3 16.5h4\" /> <path d=\"M17 3v18\" /> <path d=\"M17 7.5h4\" /> <path d=\"M17 16.5h4\" />","dumbbell":"<path d=\"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z\" /> <path d=\"m2.5 21.5 1.4-1.4\" /> <path d=\"m20.1 3.9 1.4-1.4\" /> <path d=\"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z\" /> <path d=\"m9.6 14.4 4.8-4.8\" />","gift":"<path d=\"M12 7v14\" /> <path d=\"M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8\" /> <path d=\"M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5\" /> <rect x=\"3\" y=\"7\" width=\"18\" height=\"4\" rx=\"1\" />","fuel":"<path d=\"M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5\" /> <path d=\"M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16\" /> <path d=\"M2 21h13\" /> <path d=\"M3 9h11\" />","smartphone":"<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />","zap":"<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\" />","cloud":"<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\" />","book":"<path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\" />","paw-print":"<circle cx=\"11\" cy=\"4\" r=\"2\" /> <circle cx=\"18\" cy=\"8\" r=\"2\" /> <circle cx=\"20\" cy=\"16\" r=\"2\" /> <path d=\"M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z\" />","shirt":"<path d=\"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z\" />","graduation-cap":"<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\" /> <path d=\"M22 10v6\" /> <path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\" />","sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />","trending-up":"<path d=\"M16 7h6v6\" /> <path d=\"m22 7-8.5 8.5-5-5L2 17\" />","landmark":"<path d=\"M10 18v-7\" /> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\" /> <path d=\"M14 18v-7\" /> <path d=\"M18 18v-7\" /> <path d=\"M3 22h18\" /> <path d=\"M6 18v-7\" />","receipt":"<path d=\"M12 17V7\" /> <path d=\"M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8\" /> <path d=\"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z\" />","gamepad-2":"<line x1=\"6\" x2=\"10\" y1=\"11\" y2=\"11\" /> <line x1=\"8\" x2=\"8\" y1=\"9\" y2=\"13\" /> <line x1=\"15\" x2=\"15.01\" y1=\"12\" y2=\"12\" /> <line x1=\"18\" x2=\"18.01\" y1=\"10\" y2=\"10\" /> <path d=\"M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z\" />","baby":"<path d=\"M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5\" /> <path d=\"M15 12h.01\" /> <path d=\"M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1\" /> <path d=\"M9 12h.01\" />","train-front":"<path d=\"M8 3.1V7a4 4 0 0 0 8 0V3.1\" /> <path d=\"m9 15-1-1\" /> <path d=\"m15 15 1-1\" /> <path d=\"M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z\" /> <path d=\"m8 19-2 3\" /> <path d=\"m16 19 2 3\" />"};
+const ICONS={"minus":"<path d=\"M5 12h14\" />","archive":"<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />","archive-restore":"<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />","plus":"<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />","shopping-cart":"<path d=\"m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18\" /> <path d=\"M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25\" /> <circle cx=\"18\" cy=\"20\" r=\"2\" /> <circle cx=\"8\" cy=\"20\" r=\"2\" />","utensils":"<path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\" /> <path d=\"M7 2v20\" /> <path d=\"M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7\" />","coffee":"<path d=\"M10 2v2\" /> <path d=\"M14 2v2\" /> <path d=\"M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1\" /> <path d=\"M6 2v2\" />","house":"<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />","bus":"<path d=\"M8 6v6\" /> <path d=\"M15 6v6\" /> <path d=\"M2 12h19.6\" /> <path d=\"M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3\" /> <circle cx=\"7\" cy=\"18\" r=\"2\" /> <path d=\"M9 18h5\" /> <circle cx=\"16\" cy=\"18\" r=\"2\" />","car":"<path d=\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\" /> <circle cx=\"7\" cy=\"17\" r=\"2\" /> <path d=\"M9 17h6\" /> <circle cx=\"17\" cy=\"17\" r=\"2\" />","repeat":"<path d=\"m17 2 4 4-4 4\" /> <path d=\"M3 11v-1a4 4 0 0 1 4-4h14\" /> <path d=\"m7 22-4-4 4-4\" /> <path d=\"M21 13v1a4 4 0 0 1-4 4H3\" />","plane":"<path d=\"M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z\" />","shopping-bag":"<path d=\"M16 10a4 4 0 0 1-8 0\" /> <path d=\"M3.103 6.034h17.794\" /> <path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\" />","heart-pulse":"<path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5\" /> <path d=\"M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27\" />","ellipsis":"<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />","briefcase":"<path d=\"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\" /> <rect width=\"20\" height=\"14\" x=\"2\" y=\"6\" rx=\"2\" />","laptop":"<path d=\"M18 5a2 2 0 0 1 2 2v8.526a2 2 0 0 0 .212.897l1.068 2.127a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45l1.068-2.127A2 2 0 0 0 4 15.526V7a2 2 0 0 1 2-2z\" /> <path d=\"M20.054 15.987H3.946\" />","piggy-bank":"<path d=\"M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z\" /> <path d=\"M16 10h.01\" /> <path d=\"M2 8v1a2 2 0 0 0 2 2h1\" />","coins":"<path d=\"M13.744 17.736a6 6 0 1 1-7.48-7.48\" /> <path d=\"M15 6h1v4\" /> <path d=\"m6.134 14.768.866-.5 2 3.464\" /> <circle cx=\"16\" cy=\"8\" r=\"6\" />","arrow-left-right":"<path d=\"M8 3 4 7l4 4\" /> <path d=\"M4 7h16\" /> <path d=\"m16 21 4-4-4-4\" /> <path d=\"M20 17H4\" />","layout-grid":"<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" />","list":"<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />","chart-column":"<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"M18 17V9\" /> <path d=\"M13 17V5\" /> <path d=\"M8 17v-3\" />","refresh-cw":"<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />","settings":"<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />","plus":"<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />","search":"<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />","x":"<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />","chevron-down":"<path d=\"m6 9 6 6 6-6\" />","chevron-right":"<path d=\"m9 18 6-6-6-6\" />","chevron-left":"<path d=\"m15 18-6-6 6-6\" />","trash-2":"<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />","pencil":"<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />","wallet":"<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\" /> <path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\" />","credit-card":"<rect width=\"20\" height=\"14\" x=\"2\" y=\"5\" rx=\"2\" /> <line x1=\"2\" x2=\"22\" y1=\"10\" y2=\"10\" /> <path d=\"M6 14h2\" />","banknote":"<rect width=\"20\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\" /> <circle cx=\"12\" cy=\"12\" r=\"2\" /> <path d=\"M6 12h.01M18 12h.01\" />","calendar":"<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />","sun":"<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />","moon":"<path d=\"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401\" />","download":"<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />","upload":"<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />","rotate-ccw":"<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />","pause":"<rect x=\"14\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" /> <rect x=\"5\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" />","play":"<path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\" />","ban":"<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M4.929 4.929 19.07 19.071\" />","sliders-horizontal":"<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />","check":"<path d=\"M20 6 9 17l-5-5\" />","music":"<path d=\"M21 16V3a1 1 0 0 0-1.28-.96l-10 2.917a1 1 0 0 0-.72.96V19\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" /> <circle cx=\"6\" cy=\"19\" r=\"3\" />","tv":"<path d=\"m17 2-5 5-5-5\" /> <rect width=\"20\" height=\"15\" x=\"2\" y=\"7\" rx=\"2\" />","film":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M7 3v18\" /> <path d=\"M3 7.5h4\" /> <path d=\"M3 12h18\" /> <path d=\"M3 16.5h4\" /> <path d=\"M17 3v18\" /> <path d=\"M17 7.5h4\" /> <path d=\"M17 16.5h4\" />","dumbbell":"<path d=\"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z\" /> <path d=\"m2.5 21.5 1.4-1.4\" /> <path d=\"m20.1 3.9 1.4-1.4\" /> <path d=\"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z\" /> <path d=\"m9.6 14.4 4.8-4.8\" />","gift":"<path d=\"M12 7v14\" /> <path d=\"M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8\" /> <path d=\"M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5\" /> <rect x=\"3\" y=\"7\" width=\"18\" height=\"4\" rx=\"1\" />","fuel":"<path d=\"M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5\" /> <path d=\"M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16\" /> <path d=\"M2 21h13\" /> <path d=\"M3 9h11\" />","smartphone":"<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />","zap":"<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\" />","cloud":"<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\" />","book":"<path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\" />","paw-print":"<circle cx=\"11\" cy=\"4\" r=\"2\" /> <circle cx=\"18\" cy=\"8\" r=\"2\" /> <circle cx=\"20\" cy=\"16\" r=\"2\" /> <path d=\"M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z\" />","shirt":"<path d=\"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z\" />","graduation-cap":"<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\" /> <path d=\"M22 10v6\" /> <path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\" />","sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />","trending-up":"<path d=\"M16 7h6v6\" /> <path d=\"m22 7-8.5 8.5-5-5L2 17\" />","landmark":"<path d=\"M10 18v-7\" /> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\" /> <path d=\"M14 18v-7\" /> <path d=\"M18 18v-7\" /> <path d=\"M3 22h18\" /> <path d=\"M6 18v-7\" />","receipt":"<path d=\"M12 17V7\" /> <path d=\"M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8\" /> <path d=\"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z\" />","gamepad-2":"<line x1=\"6\" x2=\"10\" y1=\"11\" y2=\"11\" /> <line x1=\"8\" x2=\"8\" y1=\"9\" y2=\"13\" /> <line x1=\"15\" x2=\"15.01\" y1=\"12\" y2=\"12\" /> <line x1=\"18\" x2=\"18.01\" y1=\"10\" y2=\"10\" /> <path d=\"M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z\" />","baby":"<path d=\"M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5\" /> <path d=\"M15 12h.01\" /> <path d=\"M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1\" /> <path d=\"M9 12h.01\" />","train-front":"<path d=\"M8 3.1V7a4 4 0 0 0 8 0V3.1\" /> <path d=\"m9 15-1-1\" /> <path d=\"m15 15 1-1\" /> <path d=\"M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z\" /> <path d=\"m8 19-2 3\" /> <path d=\"m16 19 2 3\" />"};
 </script>
 <script>
 'use strict';
@@ -723,6 +785,12 @@ function normalize() {
   S.accounts ??= []; S.categories ??= []; S.transactions ??= []; S.recurring ??= [];
   S.rates ??= JSON.parse(JSON.stringify(BUILTIN_RATES));
   S.rateOverrides ??= {};
+  if (!S.settings.accOrder) {
+    // one-time: the account array order becomes the carousel order (Cash, [All cards], Savings, cards…)
+    const rank = { cash: 0, savings: 1, card: 2, other: 3 };
+    S.accounts = S.accounts.map((a, i) => [a, i]).sort((x, y) => (rank[x[0].type] ?? 4) - (rank[y[0].type] ?? 4) || x[1] - y[1]).map(x => x[0]);
+    S.settings.accOrder = 1;
+  }
   ensureFallbackCats();
 }
 function ensureFallbackCats() {
@@ -734,8 +802,13 @@ function ensureFallbackCats() {
 const acc = id => S.accounts.find(a => a.id === id);
 const cat = id => S.categories.find(c => c.id === id) || S.categories.find(c => c.id === 'c_other');
 const accCur = id => acc(id)?.currency || 'HUF';
-const ACC_TYPES = { cash: 'Készpénz', card: 'Bankkártya', savings: 'Megtakarítás' };
-const ACC_ICON = { cash: 'banknote', card: 'credit-card', savings: 'piggy-bank' };
+const ACC_TYPES = { card: 'Bankkártya', cash: 'Készpénz', savings: 'Megtakarítás', other: 'Egyéb app' };
+const ACC_ICON = { cash: 'banknote', card: 'credit-card', savings: 'piggy-bank', other: 'smartphone' };
+const accIcon = a => a?.icon || ACC_ICON[a?.type] || 'wallet';
+const activeAccounts = () => S.accounts.filter(a => !a.archived);
+// accounts offered in pickers: active ones, plus any archived account that is already selected
+const accChoices = (...keep) => S.accounts.filter(a => !a.archived || keep.includes(a.id));
+const accName = id => { const a = acc(id); return a ? a.name + (a.archived ? ' (archivált)' : '') : '?'; };
 
 /* ---------- Exchange rates ---------- */
 function autoRate(cur) {
@@ -983,15 +1056,15 @@ function sampleData() {
 
   const D = {
     version: 1,
-    settings: { theme: S?.settings?.theme || 'dark' },
+    settings: { theme: S?.settings?.theme || 'dark', accOrder: 1 },
     rates: S?.rates?.source === 'ecb' ? S.rates : JSON.parse(JSON.stringify(BUILTIN_RATES)),
     rateOverrides: {},
     accounts: [
       { id: 'acc_cash', name: 'Készpénz', type: 'cash', currency: 'HUF', opening: 38000, slot: 3 },
+      { id: 'acc_sav', name: 'Megtakarítás', type: 'savings', currency: 'HUF', opening: 2350000, slot: 6 },
       { id: 'acc_otp', name: 'OTP Mastercard', type: 'card', currency: 'HUF', opening: 455000, slot: 2 },
       { id: 'acc_rev', name: 'Revolut', type: 'card', currency: 'EUR', opening: 420, slot: 0 },
       { id: 'acc_kh', name: 'K&H Visa', type: 'card', currency: 'HUF', opening: 62000, slot: 4 },
-      { id: 'acc_sav', name: 'Megtakarítás', type: 'savings', currency: 'HUF', opening: 2350000, slot: 6 },
     ],
     categories: [
       { id: 'c_groc', name: 'Élelmiszer', kind: 'expense', icon: 'shopping-cart', slot: 0 },
@@ -1195,7 +1268,8 @@ function attachSwipeDown(panel, handleEls, scroller, onClose, onProgress) {
   }));
 }
 
-function openSheet({ title, body, onMount, onClose, cls = '' }) {
+// from: an element (e.g. an account card) the sheet grows out of and, on cancel, shrinks back into
+function openSheet({ title, body, onMount, onClose, cls = '', from = null }) {
   const layer = document.createElement('div'); layer.className = 'layer';
   layer.innerHTML = `<div class="backdrop"></div>
     <section class="sheet ${cls}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
@@ -1203,19 +1277,48 @@ function openSheet({ title, body, onMount, onClose, cls = '' }) {
       <div class="sheet-h"><h2>${esc(title)}</h2><button class="icon-btn" data-close aria-label="Bezárás">${icon('x')}</button></div>
       <div class="sheet-b">${body}</div>
     </section>`;
-  $('#layers').append(layer); lockBody();
   const sheet = $('.sheet', layer), bd = $('.backdrop', layer), sb = $('.sheet-b', layer);
+  const visible = el => !!el && el.isConnected && el.getBoundingClientRect().width > 0;
+  const morph = !reduced() && visible(from);
+  let radius = 28;
+  if (morph) { // start state is set before the sheet is ever styled, so its content fades in from 0
+    layer.classList.add('morph');
+    sheet.insertAdjacentHTML('afterbegin', '<div class="skin skin-p"></div><div class="skin skin-a"></div>');
+    const cs = getComputedStyle(from), sa = $('.skin-a', sheet);
+    sa.style.backgroundImage = cs.backgroundImage; sa.style.backgroundColor = cs.backgroundColor;
+    sa.style.border = `${cs.borderTopWidth} ${cs.borderTopStyle} ${cs.borderTopColor}`;
+    radius = parseFloat(cs.borderTopLeftRadius) || 28;
+    sheet.style.transition = 'none';
+  }
+  $('#layers').append(layer); lockBody();
+  const toSource = () => {
+    const r = from.getBoundingClientRect();
+    const sx = r.width / sheet.offsetWidth, sy = r.height / sheet.offsetHeight;
+    $('.skin-a', sheet).style.borderRadius = `${(radius / sx).toFixed(1)}px / ${(radius / sy).toFixed(1)}px`;
+    return `translate(${(r.left - sheet.offsetLeft).toFixed(1)}px, ${(r.top - sheet.offsetTop).toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+  };
   let closed = false;
   const api = {
-    el: sheet, layer,
-    close(fromDy) {
+    el: sheet, layer, morph,
+    // opts.plain: close by sliding down even if the sheet morphed open (used after saving)
+    close(fromDy, opts = {}) {
       if (closed) return; closed = true;
-      sheet.style.transition = ''; layer.classList.remove('open');
+      document.removeEventListener('keydown', onKey);
+      const done = () => { if (from) from.classList.remove('morph-src'); layer.remove(); lockBody(); onClose && onClose(); };
+      if (morph && !opts.plain && !reduced() && visible(from)) {
+        layer.classList.remove('open', 'morph-in'); layer.classList.add('morph-out');
+        sheet.classList.remove('dragging');
+        sheet.style.transformOrigin = '0 0';
+        sheet.style.transition = 'transform .44s cubic-bezier(.3,.9,.25,1)';
+        sheet.style.transform = toSource();
+        setTimeout(done, 430);
+        return;
+      }
+      if (from) from.classList.remove('morph-src');
+      sheet.style.transition = ''; sheet.style.transformOrigin = ''; layer.classList.remove('open');
       sheet.style.transform = '';
       if (fromDy) { sheet.style.transform = `translateY(${fromDy}px)`; requestAnimationFrame(() => { sheet.style.transform = ''; }); }
-      const done = () => { layer.remove(); lockBody(); onClose && onClose(); };
       reduced() ? done() : setTimeout(done, 380);
-      document.removeEventListener('keydown', onKey);
     }
   };
   const onKey = e => { if (e.key === 'Escape') api.close(); };
@@ -1224,9 +1327,26 @@ function openSheet({ title, body, onMount, onClose, cls = '' }) {
   $('[data-close]', layer).onclick = () => api.close();
   attachSwipeDown(sheet, [$('.grab', layer), $('.sheet-h', layer)], sb, dy => api.close(dy), dy => { bd.style.opacity = String(clamp(1 - dy / 400, .2, 1)); });
   onMount && onMount(sheet, api);
-  sheet.getBoundingClientRect();
-  requestAnimationFrame(() => layer.classList.add('open'));
+  if (morph) {
+    sheet.style.transformOrigin = '0 0';
+    sheet.style.transform = toSource();
+    from.classList.add('morph-src');
+    sheet.getBoundingClientRect();
+    requestAnimationFrame(() => {
+      sheet.style.transition = 'transform var(--spring-dur) var(--spring)';
+      sheet.style.transform = 'none';
+      layer.classList.add('open', 'morph-in');
+    });
+  } else {
+    sheet.getBoundingClientRect();
+    requestAnimationFrame(() => layer.classList.add('open'));
+  }
   return api;
+}
+
+// Short vibration where the Vibration API exists (Android); silently skipped elsewhere (e.g. iPhone)
+function haptic(ms = 12) {
+  try { if (typeof navigator.vibrate === 'function') navigator.vibrate(ms); } catch (_) { /* ignore */ }
 }
 
 function confirmDialog({ title, text, ok = 'Rendben', danger = false }) {
@@ -1341,8 +1461,8 @@ function txTitle(t) {
 }
 function txSub(t, withDate) {
   const parts = [];
-  if (t.type === 'transfer') parts.push(`${acc(t.accountId)?.name || '?'} → ${acc(t.toAccountId)?.name || '?'}`);
-  else { parts.push(cat(t.categoryId)?.name); parts.push(acc(t.accountId)?.name); }
+  if (t.type === 'transfer') parts.push(`${accName(t.accountId)} → ${accName(t.toAccountId)}`);
+  else { parts.push(cat(t.categoryId)?.name); parts.push(accName(t.accountId)); }
   if (withDate) parts.push(fmtDateShort(t.date));
   return parts.filter(Boolean).map(esc).join(' · ');
 }
@@ -1390,6 +1510,7 @@ function renderPage(enter) {
   if (!PAGES[route]) route = 'dashboard';
   const root = $('#page');
   root.onclick = null;
+  if (enter && UI.editing) exitEdit({ silent: true });
   if (enter) { detailApi && detailApi.close(true); root.className = 'entering'; window.scrollTo(0, 0); }
   RENDER[route](root, enter);
   updateNav();
@@ -1404,17 +1525,15 @@ document.addEventListener('click', e => {
 });
 
 /* ---------------- Dashboard ---------------- */
+// Carousel order = order of active accounts in S.accounts, with "All bank cards" fixed in position 2
 function carItems(key) {
   const asOf = minD(monthEnd(key), today());
-  const single = a => ({ id: a.id, name: a.name, ids: [a.id], cur: a.currency, bal: balance(a.id, asOf), balHUF: balanceHUF(a.id, asOf), icon: ACC_ICON[a.type], slot: a.slot, kind: a.currency, account: a, list: [a] });
-  const group = (id, name, list, ic, slot, kind) => ({ id, name, ids: list.map(a => a.id), cur: 'HUF', bal: sum(list, a => balanceHUF(a.id, asOf)), icon: ic, slot, kind, list, group: true });
-  const by = t => S.accounts.filter(a => a.type === t);
-  const cash = by('cash'), cards = by('card'), sav = by('savings');
-  const items = [];
-  if (cash.length) items.push(cash.length === 1 ? single(cash[0]) : group('g_cash', 'Készpénz', cash, 'banknote', 3, 'Készpénz'));
-  items.push(group('g_cards', 'Összes bankkártya', cards, 'wallet', 7, `${cards.length} kártya`));
-  if (sav.length) items.push(sav.length === 1 ? single(sav[0]) : group('g_sav', 'Megtakarítás', sav, 'piggy-bank', 6, 'Megtakarítás'));
-  cards.forEach(a => items.push(single(a)));
+  const active = activeAccounts();
+  const cards = active.filter(a => a.type === 'card');
+  const single = a => ({ id: a.id, name: a.name, ids: [a.id], cur: a.currency, bal: balance(a.id, asOf), balHUF: balanceHUF(a.id, asOf), icon: accIcon(a), slot: a.slot, kind: a.currency, account: a, list: [a] });
+  const all = { id: 'g_cards', name: 'Összes bankkártya', ids: cards.map(a => a.id), cur: 'HUF', bal: sum(cards, a => balanceHUF(a.id, asOf)), icon: 'wallet', slot: 7, kind: `${cards.length} kártya`, list: cards, group: true };
+  const items = active.map(single);
+  items.splice(Math.min(1, items.length), 0, all);
   return items;
 }
 function carCardHTML(it, key) {
@@ -1429,6 +1548,13 @@ function carCardHTML(it, key) {
     <div class="acc-sub">${conv}<span class="inc">↑ ${money(f.inn)}</span><span>↓ ${money(f.out)}</span></div>
   </div>`;
 }
+function carSlotHTML(it, key, canDelete) {
+  const del = it.account && canDelete ? `<button class="acc-del" data-del="${it.id}" aria-label="${esc(it.name)} eltávolítása">${icon('minus')}</button>` : '';
+  return `<div class="car-slot" data-id="${it.id}" role="group" aria-label="${esc(it.name)}"><div class="acc-j"><div class="acc-w">${carCardHTML(it, key)}${del}</div></div></div>`;
+}
+function newSlotHTML() {
+  return `<div class="car-slot car-new" data-new="1" role="group" aria-label="Új számla"><div class="acc-j"><div class="acc-w"><button class="acc-add" aria-label="Új számla hozzáadása"><span class="plus">${icon('plus')}</span><span>Új számla</span></button></div></div></div>`;
+}
 RENDER.dashboard = (root, enter) => {
   const months = dataMonths();
   if (!UI.month || !months.includes(UI.month)) UI.month = curMonth();
@@ -1438,7 +1564,7 @@ RENDER.dashboard = (root, enter) => {
       <button class="icon-btn" data-go="settings" aria-label="Beállítások">${icon('settings')}</button>
     </header>
     <div class="pills month-pills rise" style="--i:1" id="mpills" role="tablist" aria-label="Hónap">${months.map(k => `<button class="pill ${k === UI.month ? 'on' : ''}" data-m="${k}" role="tab" aria-selected="${k === UI.month}">${cap(mName(k))}${k.slice(0, 4) !== today().slice(0, 4) ? ` <small>${k.slice(0, 4)}</small>` : ''}</button>`).join('')}</div>
-    <div class="rise" style="--i:2"><div class="car" id="car"></div><div class="dots" id="dots"></div></div>
+    <div class="rise car-wrap" id="carWrap" style="--i:2"><div class="car" id="car"></div><div class="dots" id="dots"></div><div class="edit-hint" aria-hidden="true">Tartsd lenyomva és húzd a kártyákat az átrendezéshez</div></div>
     <div class="dash-grid" id="dgrid"></div>`;
   const pills = $('#mpills');
   pills.onclick = e => {
@@ -1457,10 +1583,12 @@ function dashFill(enter) {
   const key = UI.month;
   const items = carItems(key);
   const car = $('#car');
-  const keepScroll = car.children.length > 0;
-  car.innerHTML = `<div class="car-pad"></div>` + items.map((it, i) => `<div class="car-slot" data-i="${i}" role="group" aria-label="${esc(it.name)}">${carCardHTML(it, key)}</div>`).join('') + `<div class="car-pad"></div>`;
-  if (UI.carIdx == null || UI.carIdx >= items.length) UI.carIdx = items.findIndex(x => x.id === 'g_cards');
-  setupCarousel(items, keepScroll);
+  const canDel = activeAccounts().length > 1;
+  car.innerHTML = `<div class="car-pad"></div>` + items.map(it => carSlotHTML(it, key, canDel)).join('') + newSlotHTML() + `<div class="car-pad"></div>`;
+  if (UI.carIdx == null || UI.carIdx > items.length) UI.carIdx = items.findIndex(x => x.id === 'g_cards');
+  setupCarousel();
+  applyEditClass();
+  if (UI.focusAcc) focusNewAccount(UI.focusAcc);
   $('#dgrid').innerHTML = dashGridHTML(key);
   const root = $('#page');
   runCounters(root, enter);
@@ -1469,24 +1597,25 @@ function dashFill(enter) {
   bindDashGrid(key);
 }
 
-function setupCarousel(items, keep) {
+const carSlots = (car = $('#car')) => car ? $$('.car-slot', car) : [];
+function setupCarousel() {
   const car = $('#car'), dots = $('#dots');
-  const slots = $$('.car-slot', car);
-  dots.innerHTML = slots.map((_, i) => `<button aria-label="${esc(items[i].name)}"></button>`).join('');
-  const dotEls = [...dots.children];
-  const offsetFor = i => { const s = slots[i]; return s.offsetLeft - (car.clientWidth - s.offsetWidth) / 2; };
+  const slots = carSlots(car);
+  dots.innerHTML = slots.map(s => `<button aria-label="${esc(s.getAttribute('aria-label'))}"></button>`).join('');
+  const offsetFor = i => { const s = carSlots(car)[i]; return s ? s.offsetLeft - (car.clientWidth - s.offsetWidth) / 2 : 0; };
   const update = () => {
     if (!car.isConnected) return;
+    const ss = carSlots(car), dd = [...dots.children];
     const cx = car.scrollLeft + car.clientWidth / 2; let best = 0, bd = 1e9;
-    slots.forEach((s, i) => {
+    ss.forEach((s, i) => {
       const d = (s.offsetLeft + s.offsetWidth / 2 - cx) / s.offsetWidth; const t = Math.min(Math.abs(d), 1);
-      const c = s.firstElementChild;
-      c.style.transform = `scale(${1 - .13 * t})`;
-      c.style.opacity = String(1 - .45 * t);
+      const c = s.firstElementChild, lifted = s.classList.contains('lifted');
+      c.style.transform = `scale(${lifted ? 1 : 1 - .13 * t})`;
+      c.style.opacity = String(lifted ? 1 : 1 - .45 * t);
       if (Math.abs(d) < bd) { bd = Math.abs(d); best = i; }
     });
     UI.carIdx = best;
-    dotEls.forEach((d, i) => d.classList.toggle('on', i === best));
+    dd.forEach((d, i) => d.classList.toggle('on', i === best));
   };
   const toIdx = i => car.scrollTo({ left: offsetFor(i), behavior: reduced() ? 'auto' : 'smooth' });
   if (!car._bound) {
@@ -1495,7 +1624,7 @@ function setupCarousel(items, keep) {
     // mouse drag for desktop
     let x0 = 0, s0 = 0, down = false;
     car.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; car._moved = false; x0 = e.clientX; s0 = car.scrollLeft; });
-    window.addEventListener('pointermove', e => { if (!down || !car.isConnected) return; const dx = e.clientX - x0; if (Math.abs(dx) > 4) { car._moved = true; car.classList.add('drag'); } car.scrollLeft = s0 - dx; });
+    window.addEventListener('pointermove', e => { if (!down || !car.isConnected) return; if (car._picked) { down = false; return; } const dx = e.clientX - x0; if (Math.abs(dx) > 4) { car._moved = true; car.classList.add('drag'); } car.scrollLeft = s0 - dx; });
     window.addEventListener('pointerup', () => { if (!down) return; down = false; if (car._moved) { car.classList.remove('drag'); car._toIdx && car._toIdx(UI.carIdx); } });
     let lastW = car.clientWidth;
     window.addEventListener('resize', () => {
@@ -1503,15 +1632,274 @@ function setupCarousel(items, keep) {
       if (car.clientWidth !== lastW) { lastW = car.clientWidth; car.scrollLeft = car._offsetFor(UI.carIdx); }
       car._update();
     });
+    bindCarEdit(car);
+    car.addEventListener('contextmenu', e => { if (e.target.closest('.car-slot')) e.preventDefault(); });
+    car.addEventListener('click', e => {
+      if (car._suppress) { car._suppress = false; return; }
+      if (car._moved) { car._moved = false; return; }
+      const del = e.target.closest('[data-del]');
+      if (del) { if (UI.editing) openDeleteAccount(acc(del.dataset.del)); return; }
+      const slot = e.target.closest('.car-slot'); if (!slot) return;
+      if (slot.dataset.new) { openAccountSheet(null, $('.acc-add', slot)); return; }
+      if (UI.editing) {
+        if (slot.dataset.id === 'g_cards') { shake($('.acc', slot)); toast('Ez egy számított összeg – nem szerkeszthető.'); return; }
+        openAccountSheet(acc(slot.dataset.id), $('.acc', slot)); return;
+      }
+      const i = carSlots(car).indexOf(slot);
+      if (i !== UI.carIdx) { car._toIdx(i); return; }
+      const it = carItems(UI.month).find(x => x.id === slot.dataset.id);
+      if (it) openAccDetail(it, $('.acc', slot));
+    });
   }
   car._update = update; car._toIdx = toIdx; car._offsetFor = offsetFor;
   car.scrollLeft = offsetFor(clamp(UI.carIdx, 0, slots.length - 1));
   update();
-  slots.forEach((s, i) => s.onclick = () => {
-    if (car._moved) { car._moved = false; return; }
-    if (i !== UI.carIdx) toIdx(i); else openAccDetail(items[i], s.firstElementChild);
+  [...dots.children].forEach((d, i) => d.onclick = () => toIdx(i));
+}
+
+/* ---- Account edit mode: long press → jiggle, minus badges, drag to reorder ---- */
+function suppressCarClick(car) { car._suppress = true; clearTimeout(car._supT); car._supT = setTimeout(() => { car._suppress = false; }, 450); }
+function applyEditClass() {
+  const w = $('#carWrap'); if (!w) return;
+  w.classList.toggle('editing', !!UI.editing);
+  if (UI.editing) $$('.acc-w', w).forEach(el => {
+    el.style.setProperty('--jd', (.24 + Math.random() * .09).toFixed(3) + 's');
+    el.style.setProperty('--jdel', (-Math.random() * .3).toFixed(3) + 's');
+    el.style.setProperty('--jr', (.9 + Math.random() * .5).toFixed(2) + 'deg');
   });
-  dotEls.forEach((d, i) => d.onclick = () => toIdx(i));
+}
+function enterEdit() {
+  if (UI.editing || route !== 'dashboard') return;
+  UI.editing = true;
+  document.body.classList.add('car-editing');
+  haptic(15);
+  applyEditClass();
+  let b = $('#editDone');
+  if (!b) { b = document.createElement('button'); b.id = 'editDone'; b.className = 'edit-done'; b.textContent = 'Kész'; b.onclick = () => exitEdit(); document.body.append(b); }
+  requestAnimationFrame(() => requestAnimationFrame(() => b.classList.add('show')));
+  try { history.pushState({ prismEdit: 1 }, ''); } catch (_) { /* ignore */ }
+}
+function exitEdit(opts = {}) {
+  if (!UI.editing) return;
+  UI.editing = false;
+  document.body.classList.remove('car-editing');
+  const w = $('#carWrap');
+  if (w) {
+    // settle each card smoothly from wherever its wobble currently is
+    const ws = $$('.acc-w', w); const mats = ws.map(el => getComputedStyle(el).transform);
+    w.classList.remove('editing');
+    if (!reduced()) ws.forEach((el, i) => { if (mats[i] && mats[i] !== 'none') el.animate([{ transform: mats[i] }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,1.3,.4,1)' }); });
+  }
+  const b = $('#editDone'); if (b) { b.classList.remove('show'); setTimeout(() => b.remove(), 400); }
+  if (!opts.fromPop && !opts.silent && history.state && history.state.prismEdit) history.back();
+}
+window.addEventListener('popstate', () => { if (UI.editing) exitEdit({ fromPop: true }); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.editing && !$('#layers').children.length) exitEdit(); });
+// Tapping empty space ends edit mode (and does nothing else); navigation still works
+document.addEventListener('click', e => {
+  if (!UI.editing) return;
+  const t = e.target;
+  if (t.closest('.car-slot, #editDone, .layer, #toasts, .dots')) return;
+  exitEdit();
+  if (t.closest('.tabbar, .sidebar, .fab')) return;
+  e.preventDefault(); e.stopPropagation();
+}, true);
+
+function bindCarEdit(car) {
+  let st = null, raf = 0;
+  const accSlots = () => carSlots(car).filter(s => s.dataset.id && s.dataset.id !== 'g_cards');
+  const cancel = () => { if (st) clearTimeout(st.timer); st = null; };
+  const begin = (target, x, y) => {
+    if (target.closest('.acc-del')) return;
+    const slot = target.closest('.car-slot'); if (!slot) return;
+    cancel();
+    st = { slot, x0: x, y0: y, x, y, picked: false, moved: false, tx: 0 };
+    const draggable = !!slot.dataset.id && slot.dataset.id !== 'g_cards';
+    st.timer = setTimeout(() => {
+      if (!st) return;
+      if (!UI.editing) { enterEdit(); suppressCarClick(car); }
+      if (draggable && UI.editing) pickUp();
+    }, UI.editing ? 220 : 500);
+  };
+  const place = () => {
+    st.tx = st.x - st.x0 + (car.scrollLeft - st.scroll0) - (st.slot.offsetLeft - st.left0);
+    st.slot.style.transform = `translateX(${st.tx.toFixed(1)}px)`;
+  };
+  const reorder = () => {
+    const list = accSlots();
+    const cx = st.slot.offsetLeft + st.slot.offsetWidth / 2 + st.tx;
+    const others = list.filter(s => s !== st.slot);
+    const idx = others.filter(s => s.offsetLeft + s.offsetWidth / 2 < cx).length;
+    if (idx === list.indexOf(st.slot)) return;
+    const order = others.map(s => s.dataset.id); order.splice(idx, 0, st.slot.dataset.id);
+    applyCarOrder(car, order, st.slot);
+    place();
+  };
+  const loop = () => {
+    if (!st || !st.picked) return;
+    const r = car.getBoundingClientRect(), edge = 44;
+    const v = st.x < r.left + edge ? -9 : st.x > r.right - edge ? 9 : 0;
+    if (v) { car.scrollLeft += v; place(); reorder(); }
+    raf = requestAnimationFrame(loop);
+  };
+  const pickUp = () => {
+    st.picked = true; car._picked = true;
+    st.scroll0 = car.scrollLeft; st.left0 = st.slot.offsetLeft;
+    st.slot.classList.add('lifted'); car.classList.add('drag'); car._update();
+    loop();
+  };
+  const move = (x, y, e) => {
+    if (!st) return;
+    st.x = x; st.y = y;
+    if (!st.picked) { if (Math.hypot(x - st.x0, y - st.y0) > 8) cancel(); return; } // a swipe: let the carousel scroll
+    if (e && e.cancelable) e.preventDefault();
+    st.moved = true; place(); reorder();
+  };
+  const end = () => {
+    if (!st) return;
+    const s = st; st = null; clearTimeout(s.timer); cancelAnimationFrame(raf);
+    if (!s.picked) return;
+    car._picked = false; car.classList.remove('drag'); s.slot.classList.remove('lifted');
+    const from = s.slot.style.transform; s.slot.style.transform = '';
+    if (from && !reduced()) s.slot.animate([{ transform: from }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,1.1,.3,1)' });
+    suppressCarClick(car);
+    if (s.moved) saveCarOrder(car);
+    const i = carSlots(car).indexOf(s.slot); if (i >= 0) car._toIdx(i);
+  };
+  car.addEventListener('touchstart', e => { if (e.touches.length === 1) begin(e.target, e.touches[0].clientX, e.touches[0].clientY); else cancel(); }, { passive: true });
+  car.addEventListener('touchmove', e => { if (e.touches.length === 1) move(e.touches[0].clientX, e.touches[0].clientY, e); }, { passive: false });
+  car.addEventListener('touchend', end); car.addEventListener('touchcancel', end);
+  car.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button === 0) begin(e.target, e.clientX, e.clientY); });
+  window.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && st) move(e.clientX, e.clientY, e); });
+  window.addEventListener('pointerup', e => { if (e.pointerType === 'mouse') end(); });
+}
+// Reorder the carousel DOM to `order` (account ids); "All bank cards" stays 2nd, "+ Új számla" last.
+// The other cards slide to their new places (FLIP, transform only).
+function applyCarOrder(car, order, dragged) {
+  const all = carSlots(car);
+  const byId = new Map(all.map(s => [s.dataset.id || 'new', s]));
+  const before = new Map(all.map(s => [s, s.offsetLeft]));
+  const seq = order.map(id => byId.get(id)).filter(Boolean);
+  if (byId.get('g_cards')) seq.splice(Math.min(1, seq.length), 0, byId.get('g_cards'));
+  if (byId.get('new')) seq.push(byId.get('new'));
+  const endPad = car.lastElementChild;
+  seq.forEach(s => car.insertBefore(s, endPad));
+  if (reduced()) return;
+  seq.forEach(s => {
+    if (s === dragged) return;
+    const d = before.get(s) - s.offsetLeft;
+    if (Math.abs(d) > .5) s.animate([{ transform: `translateX(${d}px)` }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,1,.3,1)' });
+  });
+}
+function saveCarOrder(car) {
+  const ids = carSlots(car).map(s => s.dataset.id).filter(id => id && id !== 'g_cards');
+  const moved = ids.map(acc).filter(Boolean);
+  S.accounts = [...moved, ...S.accounts.filter(a => !ids.includes(a.id))];
+  save();
+  const dots = $('#dots'); if (dots) carSlots(car).forEach((s, i) => dots.children[i] && dots.children[i].setAttribute('aria-label', s.getAttribute('aria-label')));
+}
+// Card collapses out of the carousel; the others slide together (transform/opacity only)
+function collapseSlot(id, done) {
+  const car = $('#car'); const slot = car && car.querySelector(`.car-slot[data-id="${id}"]`);
+  if (!slot || reduced()) { done(); return; }
+  const others = carSlots(car).filter(s => s !== slot);
+  const before = new Map(others.map(s => [s, s.getBoundingClientRect().left]));
+  const a = slot.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.55)', opacity: 0 }], { duration: 260, easing: 'cubic-bezier(.4,0,.7,1)', fill: 'forwards' });
+  a.onfinish = () => {
+    slot.remove();
+    others.forEach(s => { const d = before.get(s) - s.getBoundingClientRect().left; if (Math.abs(d) > .5) s.animate([{ transform: `translateX(${d}px)` }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,1,.3,1)' }); });
+    car._update && car._update();
+    setTimeout(done, 430);
+  };
+}
+// After adding/restoring: the new card slides in and the carousel scrolls to it
+function focusNewAccount(id) {
+  UI.focusAcc = null;
+  const car = $('#car'); const ss = carSlots(car); const i = ss.findIndex(s => s.dataset.id === id);
+  if (i < 0) return;
+  if (!reduced()) $('.acc-j', ss[i]).animate([{ opacity: 0, transform: 'translateY(16px) scale(.8)' }, { opacity: 1, transform: 'none' }], { duration: 650, easing: 'cubic-bezier(.2,1.2,.3,1)' });
+  setTimeout(() => car._toIdx(i), 60);
+}
+
+/* ---- Removing an account: archive (recommended) or delete with transactions ---- */
+function openDeleteAccount(a) {
+  if (!a) return;
+  const active = activeAccounts();
+  if (active.length <= 1) { toast('Az utolsó számla nem távolítható el.'); return; }
+  const txs = S.transactions.filter(t => t.accountId === a.id || t.toAccountId === a.id);
+  const recs = S.recurring.filter(r => r.accountId === a.id && r.status !== 'cancelled');
+  const others = active.filter(x => x.id !== a.id);
+  let target = recs.length ? (others.find(x => x.currency === a.currency && x.type === a.type) || others.find(x => x.currency === a.currency) || others[0]).id : null;
+  const bal = balance(a.id);
+  openSheet({
+    title: 'Számla eltávolítása',
+    body: `
+      <div class="del-card" style="--ca:${hexA(slotColor(a.slot), themeMode() === 'light' ? .22 : .42)}">
+        <span class="cico" style="${cVars(a.slot)}">${icon(accIcon(a))}</span>
+        <div class="row-m"><div class="row-t">${esc(a.name)}</div><div class="row-s">${ACC_TYPES[a.type] || ''} · ${a.currency}</div></div>
+        <div class="row-a del-bal">${money(bal, a.currency)}${a.currency !== 'HUF' ? `<small>≈ ${money(balanceHUF(a.id))}</small>` : ''}</div>
+      </div>
+      <p class="del-note">${txs.length ? `${txs.length} tétel tartozik ehhez a számlához.` : 'Ehhez a számlához még nem tartozik tétel.'}</p>
+      ${recs.length ? `<div class="field"><span>${recs.length} ismétlődő tétel használja ezt a számlát (${esc(recs.map(r => r.name).join(', '))}). Hová kerüljenek?</span><div class="hscroll" id="dRec"></div></div>` : ''}
+      <div class="del-foot" id="dFoot"></div>`,
+    onMount(sh, api) {
+      const drawRec = () => {
+        const box = $('#dRec', sh); if (!box) return;
+        box.innerHTML = others.map(x => `<button class="chip ${target === x.id ? 'on' : ''}" data-rt="${x.id}" style="--c:${tintColor(x.slot)}"><span class="cico" style="${cVars(x.slot)}">${icon(accIcon(x))}</span>${esc(x.name)}</button>`).join('')
+          + `<button class="chip plain ${target === 'pause' ? 'on' : ''}" data-rt="pause">${icon('pause')}Szüneteltetés</button>`;
+      };
+      const foot = $('#dFoot', sh);
+      const finish = mode => { api.close(undefined, { plain: true }); removeAccount(a, mode, target); };
+      const stage1 = () => {
+        foot.innerHTML = txs.length ? `
+          <button class="btn primary block" id="dArch">${icon('archive')}Archiválás <span class="rec-tag">ajánlott</span></button>
+          <p class="del-help">Eltűnik a kártyák közül, de a tételei megmaradnak az Előzményekben, az Idővonalon és az összesítésekben. A Beállításokban bármikor visszaállíthatod.</p>
+          <button class="btn danger-o block" id="dAll">${icon('trash-2')}Törlés mindennel</button>
+          <p class="del-help">A számla és mind a(z) ${txs.length} tétele törlődik.</p>`
+          : `<button class="btn danger-fill block" id="dDel">${icon('trash-2')}Törlés</button>`;
+        const ar = $('#dArch', sh); if (ar) ar.onclick = () => finish('archive');
+        const al = $('#dAll', sh); if (al) al.onclick = stage2;
+        const dl = $('#dDel', sh); if (dl) dl.onclick = () => finish('delete');
+      };
+      const stage2 = () => {
+        foot.innerHTML = `<div class="del-confirm" role="alert"><b>Biztos?</b><span>A(z) „${esc(a.name)}” számla és mind a(z) ${txs.length} tétele törlődik.</span></div>
+          <div class="btn-row"><button class="btn" id="dBack" style="flex:1">Mégse</button><button class="btn danger-fill" id="dYes" style="flex:1">${icon('trash-2')}Igen, törlöm</button></div>`;
+        $('#dBack', sh).onclick = stage1;
+        $('#dYes', sh).onclick = () => finish('delete');
+      };
+      drawRec(); stage1();
+      sh.addEventListener('click', e => { const c = e.target.closest('[data-rt]'); if (c) { target = c.dataset.rt; drawRec(); } });
+    }
+  });
+}
+function removeAccount(a, mode, target) {
+  const snap = JSON.stringify({ accounts: S.accounts, transactions: S.transactions, recurring: S.recurring });
+  const fallback = activeAccounts().find(x => x.id !== a.id)?.id;
+  S.recurring.forEach(r => {
+    if (r.accountId !== a.id) return;
+    if (target && target !== 'pause') { r.accountId = target; return; }
+    if (r.status === 'active') { r.status = 'paused'; r.pausedAt = today(); }
+    if (mode === 'delete' && fallback) r.accountId = fallback; // a deleted account can't keep them
+  });
+  if (mode === 'archive') { a.archived = true; a.archivedAt = today(); }
+  else {
+    S.accounts = S.accounts.filter(x => x.id !== a.id);
+    S.transactions = S.transactions.filter(t => t.accountId !== a.id && t.toAccountId !== a.id);
+  }
+  save();
+  detailApi && detailApi.close(true);
+  toast(mode === 'archive' ? `${a.name} archiválva` : `${a.name} törölve`, {
+    label: 'Visszavonás',
+    run: () => { Object.assign(S, JSON.parse(snap)); save(); UI.focusAcc = a.id; refresh(); }
+  });
+  if (route === 'dashboard') collapseSlot(a.id, () => refresh()); else refresh();
+}
+function restoreAccount(id) {
+  const a = acc(id); if (!a) return;
+  a.archived = false; delete a.archivedAt;
+  S.accounts = [...S.accounts.filter(x => x !== a), a];
+  UI.focusAcc = a.id; save(); refresh();
+  toast(`${a.name} visszaállítva`);
 }
 
 function sparkData(key) {
@@ -1663,7 +2051,7 @@ function openAccDetail(it, el) {
   const key = UI.month;
   const txs = S.transactions.filter(t => mk(t.date) === key && (it.ids.includes(t.accountId) || it.ids.includes(t.toAccountId))).sort((a, b) => b.date.localeCompare(a.date));
   const f = accountMonthFlow(it.ids, key);
-  const list = it.group ? `<section class="glass card"><div class="card-t" style="margin-bottom:4px">Számlák</div>${it.list.map(a => `<button class="row press" data-acc="${a.id}"><span class="cico" style="${cVars(a.slot)}">${icon(ACC_ICON[a.type])}</span><div class="row-m"><div class="row-t">${esc(a.name)}</div><div class="row-s">${ACC_TYPES[a.type]} · ${a.currency}</div></div><div class="row-a">${money(balance(a.id, minD(monthEnd(key), today())), a.currency)}${a.currency !== 'HUF' ? `<small>≈ ${money(balanceHUF(a.id, minD(monthEnd(key), today())))}</small>` : ''}</div></button>`).join('')}</section>` : '';
+  const list = it.group ? `<section class="glass card"><div class="card-t" style="margin-bottom:4px">Számlák</div>${it.list.map(a => `<button class="row press" data-acc="${a.id}"><span class="cico" style="${cVars(a.slot)}">${icon(accIcon(a))}</span><div class="row-m"><div class="row-t">${esc(a.name)}</div><div class="row-s">${ACC_TYPES[a.type]} · ${a.currency}</div></div><div class="row-a">${money(balance(a.id, minD(monthEnd(key), today())), a.currency)}${a.currency !== 'HUF' ? `<small>≈ ${money(balanceHUF(a.id, minD(monthEnd(key), today())))}</small>` : ''}</div></button>`).join('')}</section>` : '';
   openDetail(el, {
     title: it.name,
     actions: it.account ? `<button class="icon-btn" data-edit aria-label="Számla szerkesztése">${icon('pencil')}</button>` : '',
@@ -1727,9 +2115,9 @@ function openFreeDetail(el) {
 /* ---------------- Quick add / edit sheet ---------------- */
 function openTxSheet({ tx = null, type = null }) {
   const editing = !!tx;
-  const st = tx ? { ...tx } : { type: type || 'expense', amount: '', accountId: S.accounts.find(a => a.type === 'card')?.id || S.accounts[0]?.id, toAccountId: null, categoryId: null, date: today(), note: '' };
-  if (!S.accounts.length) { toast('Előbb hozz létre egy számlát a Beállításokban.'); return; }
-  if (st.type === 'transfer' && !st.toAccountId) st.toAccountId = S.accounts.find(a => a.id !== st.accountId)?.id;
+  const st = tx ? { ...tx } : { type: type || 'expense', amount: '', accountId: activeAccounts().find(a => a.type === 'card')?.id || activeAccounts()[0]?.id, toAccountId: null, categoryId: null, date: today(), note: '' };
+  if (!activeAccounts().length) { toast('Előbb hozz létre egy számlát a Beállításokban.'); return; }
+  if (st.type === 'transfer' && !st.toAccountId) st.toAccountId = activeAccounts().find(a => a.id !== st.accountId)?.id;
   let toTouched = !!(tx && tx.toAmount != null);
   const body = `
     ${segHTML('type', [['expense', 'Kiadás'], ['income', 'Bevétel'], ['transfer', 'Átvezetés']], st.type)}
@@ -1754,11 +2142,11 @@ function openTxSheet({ tx = null, type = null }) {
         $('#catField', sh).hidden = isT;
         $('#cats', sh).innerHTML = chips(cats, st.categoryId, 'cat');
         $('#accLabel', sh).textContent = isT ? 'Honnan' : 'Számla';
-        $('#accs', sh).innerHTML = chips(S.accounts, st.accountId, 'acc');
+        $('#accs', sh).innerHTML = chips(accChoices(tx?.accountId), st.accountId, 'acc');
         $('#toField', sh).hidden = !isT;
         if (isT) {
-          if (!st.toAccountId || st.toAccountId === st.accountId) st.toAccountId = S.accounts.find(a => a.id !== st.accountId)?.id || null;
-          $('#toAccs', sh).innerHTML = chips(S.accounts.filter(a => a.id !== st.accountId), st.toAccountId, 'to');
+          if (!st.toAccountId || st.toAccountId === st.accountId) st.toAccountId = activeAccounts().find(a => a.id !== st.accountId)?.id || null;
+          $('#toAccs', sh).innerHTML = chips(accChoices(tx?.toAccountId).filter(a => a.id !== st.accountId), st.toAccountId, 'to');
         }
         const diff = isT && st.toAccountId && accCur(st.toAccountId) !== accCur(st.accountId);
         $('#toAmtField', sh).hidden = !diff;
@@ -1906,7 +2294,7 @@ function histPills() {
   const any = HF.acc !== 'all' || HF.cat !== 'all' || HF.type !== 'all' || HF.range !== 'month';
   $('#hfPills').innerHTML = `
     <label class="pill set">${icon('calendar')}<span>${esc(rl)}</span>${icon('chevron-down')}${sel('range', ro.map(o => opt(o[0], o[1], HF.range)).join(''))}</label>
-    <label class="pill ${HF.acc !== 'all' ? 'set' : ''}">${icon('wallet')}<span>${esc(a)}</span>${icon('chevron-down')}${sel('acc', opt('all', 'Minden számla', HF.acc) + S.accounts.map(x => opt(x.id, x.name, HF.acc)).join(''))}</label>
+    <label class="pill ${HF.acc !== 'all' ? 'set' : ''}">${icon('wallet')}<span>${esc(a)}</span>${icon('chevron-down')}${sel('acc', opt('all', 'Minden számla', HF.acc) + S.accounts.map(x => opt(x.id, accName(x.id), HF.acc)).join(''))}</label>
     <label class="pill ${HF.cat !== 'all' ? 'set' : ''}">${icon('layout-grid')}<span>${esc(c)}</span>${icon('chevron-down')}${sel('cat', catOpts)}</label>
     <label class="pill ${HF.type !== 'all' ? 'set' : ''}">${icon('sliders-horizontal')}<span>${tl}</span>${icon('chevron-down')}${sel('type', [['all', 'Minden típus'], ['expense', 'Kiadás'], ['income', 'Bevétel'], ['transfer', 'Átvezetés']].map(o => opt(o[0], o[1], HF.type)).join(''))}</label>
     ${any ? `<button class="pill" id="hfReset">${icon('rotate-ccw')}Alaphelyzet</button>` : ''}`;
@@ -2340,7 +2728,7 @@ function chipList(list, sel, attr) {
 }
 function openRecSheet(r, kind) {
   const editing = !!r;
-  const st = r ? { ...r } : { kind, name: '', amount: '', accountId: S.accounts.find(a => a.type === 'card')?.id || S.accounts[0]?.id, categoryId: kind === 'income' ? 'i_salary' : 'c_subs', cycle: 'monthly', nextDate: addDays(today(), 1), trialEnds: null, icon: null };
+  const st = r ? { ...r } : { kind, name: '', amount: '', accountId: activeAccounts().find(a => a.type === 'card')?.id || activeAccounts()[0]?.id, categoryId: kind === 'income' ? 'i_salary' : 'c_subs', cycle: 'monthly', nextDate: addDays(today(), 1), trialEnds: null, icon: null };
   if (!S.categories.some(c => c.id === st.categoryId)) st.categoryId = S.categories.find(c => c.kind === kind)?.id;
   const isInc = kind === 'income';
   openSheet({
@@ -2358,7 +2746,7 @@ function openRecSheet(r, kind) {
       <div class="sheet-foot">${editing ? `<button class="btn danger" id="rDel" aria-label="Törlés">${icon('trash-2')}</button>` : ''}<button class="btn primary" id="rSave">Mentés</button></div>`,
     onMount(sh, api) {
       const draw = () => {
-        $('#rAccs', sh).innerHTML = chipList(S.accounts, st.accountId, 'acc');
+        $('#rAccs', sh).innerHTML = chipList(accChoices(r?.accountId), st.accountId, 'acc');
         $('#rCats', sh).innerHTML = chipList(S.categories.filter(c => c.kind === kind), st.categoryId, 'cat');
         $('#rCur', sh).textContent = (CURRENCIES[accCur(st.accountId)] || { sym: accCur(st.accountId) }).sym;
       };
@@ -2417,8 +2805,11 @@ RENDER.settings = root => {
     <section class="glass card rise" style="--i:1"><div class="card-h"><div class="card-t">Megjelenés</div></div>
       ${segHTML('theme', [['dark', 'Sötét'], ['light', 'Világos'], ['system', 'Rendszer']], S.settings.theme || 'dark')}</section>
 
-    <section class="glass card rise" style="--i:2"><div class="card-h"><div class="card-t">Számlák</div><button class="link" id="accNew">${icon('plus')} Új számla</button></div>
-      <div>${S.accounts.map(a => `<button class="set-row press" data-acc="${a.id}"><span class="cico" style="${cVars(a.slot)}">${icon(ACC_ICON[a.type])}</span><div class="row-m"><div class="row-t">${esc(a.name)}</div><div class="row-s">${ACC_TYPES[a.type]} · ${a.currency}</div></div><div class="row-a">${money(balance(a.id), a.currency)}${a.currency !== 'HUF' ? `<small>≈ ${money(balanceHUF(a.id))}</small>` : ''}</div>${icon('chevron-right', 'chev')}</button>`).join('') || '<div class="empty">Nincs számla.</div>'}</div></section>
+    <section class="glass card rise" style="--i:2"><div class="card-h"><div class="card-t">Számlák</div></div>
+      <div>${activeAccounts().map(a => `<button class="set-row press" data-acc="${a.id}"><span class="cico" style="${cVars(a.slot)}">${icon(accIcon(a))}</span><div class="row-m"><div class="row-t">${esc(a.name)}</div><div class="row-s">${ACC_TYPES[a.type]} · ${a.currency}</div></div><div class="row-a">${money(balance(a.id), a.currency)}${a.currency !== 'HUF' ? `<small>≈ ${money(balanceHUF(a.id))}</small>` : ''}</div>${icon('chevron-right', 'chev')}</button>`).join('') || '<div class="empty">Nincs számla.</div>'}</div>
+      <button class="btn block" id="accNew" style="margin-top:10px">${icon('plus')}Új számla</button>
+      ${S.accounts.some(a => a.archived) ? `<div class="section-t" style="margin:20px 2px 2px">Archivált számlák</div>
+      <div>${S.accounts.filter(a => a.archived).map(a => `<div class="set-row"><span class="cico" style="${cVars(a.slot)};opacity:.75">${icon(accIcon(a))}</span><div class="row-m"><div class="row-t">${esc(a.name)}</div><div class="row-s">${a.archivedAt ? `Archiválva: ${fmtDate(a.archivedAt)} · ` : ''}${S.transactions.filter(t => t.accountId === a.id || t.toAccountId === a.id).length} tétel · ${money(balance(a.id), a.currency)}</div></div><button class="btn sm" data-restore="${a.id}">${icon('archive-restore')}Visszaállítás</button></div>`).join('')}</div>` : ''}</section>
 
     <section class="glass card rise" style="--i:3"><div class="card-h"><div class="card-t">Kategóriák</div><button class="link" id="catNew">${icon('plus')} Új kategória</button></div>
       ${segHTML('ckind', [['expense', 'Kiadás'], ['income', 'Bevétel']], SETC.catKind)}
@@ -2454,10 +2845,11 @@ RENDER.settings = root => {
   };
   drawCatChips();
   root.onclick = e => {
+    const rs = e.target.closest('[data-restore]'); if (rs) return restoreAccount(rs.dataset.restore);
     const a = e.target.closest('[data-acc]'); if (a) return openAccountSheet(acc(a.dataset.acc));
     const c = e.target.closest('[data-cat]'); if (c) return openCategorySheet(cat(c.dataset.cat));
   };
-  $('#accNew').onclick = () => openAccountSheet(null);
+  $('#accNew').onclick = e => openAccountSheet(null, e.currentTarget);
   $('#catNew').onclick = () => openCategorySheet(null);
   $('#rateRefresh').onclick = async () => {
     if (rateStatus === 'loading') return;
@@ -2502,38 +2894,60 @@ function importJSON(file) {
 }
 
 function swatchesHTML(sel) { return `<div class="swatches" id="sw">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<button data-slot="${i}" class="${i === sel ? 'on' : ''}" style="--c:${tintColor(i)}" aria-label="Szín ${i + 1}"></button>`).join('')}</div>`; }
-function openAccountSheet(a) {
+const ACC_ICONS = ['credit-card', 'wallet', 'banknote', 'piggy-bank', 'landmark', 'smartphone', 'coins', 'briefcase', 'plane', 'gift', 'shopping-bag', 'house'];
+const ACC_TYPE_NOTE = {
+  card: 'A bankkártyák automatikusan beleszámítanak az „Összes bankkártya” összegbe.',
+  other: 'Pl. Revolut vagy más pénzügyi app. Nem számít bele az „Összes bankkártya” összegbe.',
+  cash: '', savings: '',
+};
+function openAccountSheet(a, from = null) {
   const editing = !!a;
-  const st = a ? { ...a } : { name: '', type: 'card', currency: 'HUF', opening: 0, slot: 1 };
+  const st = a ? { name: a.name, type: a.type, currency: a.currency, opening: a.opening || 0, slot: a.slot ?? 1, icon: a.icon || null }
+    : { name: '', type: 'card', currency: 'HUF', opening: 0, slot: 1, icon: null };
+  const flow = editing ? balance(a.id) - (a.opening || 0) : 0; // keeps the preview balance true when the start changes
+  const preview = () => {
+    const bal = flow + (st.opening || 0);
+    return `<div class="acc acc-prev" style="--ca:${hexA(slotColor(st.slot), themeMode() === 'light' ? .22 : .42)}">
+      <div class="acc-top"><span class="cico" style="${cVars(st.slot)}">${icon(st.icon || ACC_ICON[st.type])}</span><span>${esc(st.name || 'Új számla')}</span><span class="acc-kind">${st.currency}</span></div>
+      <div class="acc-bal">${money(bal, st.currency)}</div>
+      <div class="acc-sub"><span>${ACC_TYPES[st.type]}</span>${st.currency !== 'HUF' ? `<span>≈ ${money(toHUF(bal, st.currency))}</span>` : ''}</div></div>`;
+  };
   openSheet({
-    title: editing ? 'Számla szerkesztése' : 'Új számla',
-    body: `<label class="field"><span>Név</span><input class="input" id="aName" maxlength="30" placeholder="pl. OTP Mastercard" value="${esc(st.name)}"></label>
-      ${segHTML('atype', [['cash', 'Készpénz'], ['card', 'Bankkártya'], ['savings', 'Megtakarítás']], st.type)}
+    title: editing ? 'Számla szerkesztése' : 'Új számla', from,
+    body: `<div id="aPrev" aria-hidden="true">${preview()}</div>
+      <label class="field"><span>Név (kötelező)</span><input class="input" id="aName" maxlength="30" placeholder="pl. OTP Mastercard" value="${esc(st.name)}" autocomplete="off"></label>
+      <div class="field"><span>Típus</span><div class="type-grid" id="aType">${Object.entries(ACC_TYPES).map(([k, l]) => `<button class="chip ${k === st.type ? 'on' : ''}" data-type="${k}"><span class="cico" style="${cVars(8)}">${icon(ACC_ICON[k])}</span>${l}</button>`).join('')}</div><small class="type-note" id="aTypeNote">${ACC_TYPE_NOTE[st.type]}</small></div>
       <label class="field"><span>Pénznem</span><select class="select" id="aCur">${Object.entries(CURRENCIES).map(([k, v]) => `<option value="${k}" ${k === st.currency ? 'selected' : ''}>${k} – ${v.name}</option>`).join('')}</select></label>
-      <label class="field"><span>Nyitó egyenleg</span><input class="input" id="aOpen" inputmode="decimal" value="${st.opening ? fmtNum(st.opening, 2).replace(/,00$/, '') : ''}" placeholder="0"></label>
+      <label class="field"><span>Kezdő egyenleg</span><input class="input" id="aOpen" inputmode="decimal" value="${st.opening ? fmtNum(st.opening, 2).replace(/,00$/, '') : ''}" placeholder="0"></label>
       <div class="field"><span>Szín</span>${swatchesHTML(st.slot)}</div>
-      ${editing ? `<div class="card-s">Jelenlegi egyenleg: ${money(balance(a.id), a.currency)}</div>` : ''}
-      <div class="sheet-foot">${editing ? `<button class="btn danger" id="aDel" aria-label="Törlés">${icon('trash-2')}</button>` : ''}<button class="btn primary" id="aSave">Mentés</button></div>`,
+      <div class="field"><span>Ikon</span><div class="icon-grid" id="aIcons">${ACC_ICONS.map(n => `<button data-ic="${n}" class="${(st.icon || ACC_ICON[st.type]) === n ? 'on' : ''}" aria-label="${n}">${icon(n)}</button>`).join('')}</div></div>
+      <div class="sheet-foot">${editing ? `<button class="btn danger" id="aDel" aria-label="Számla eltávolítása">${icon('trash-2')}</button>` : ''}<button class="btn primary" id="aSave">${editing ? 'Mentés' : 'Számla hozzáadása'}</button></div>`,
     onMount(sh, api) {
-      bindSeg(sh, 'atype', v => st.type = v);
-      $('#sw', sh).onclick = e => { const b = e.target.closest('[data-slot]'); if (!b) return; st.slot = +b.dataset.slot; $$('[data-slot]', sh).forEach(x => x.classList.toggle('on', x === b)); };
+      const redraw = () => { $('#aPrev', sh).innerHTML = preview(); };
+      const markIcons = () => $$('[data-ic]', sh).forEach(x => x.classList.toggle('on', x.dataset.ic === (st.icon || ACC_ICON[st.type])));
+      $('#aName', sh).oninput = e => { st.name = e.target.value.trim(); redraw(); };
+      $('#aCur', sh).onchange = e => { st.currency = e.target.value; redraw(); };
+      $('#aOpen', sh).oninput = e => { const v = parseAmount(e.target.value || '0'); st.opening = isFinite(v) ? v : 0; redraw(); };
+      $('#aType', sh).onclick = e => {
+        const b = e.target.closest('[data-type]'); if (!b) return;
+        st.type = b.dataset.type; $$('[data-type]', sh).forEach(x => x.classList.toggle('on', x === b));
+        $('#aTypeNote', sh).textContent = ACC_TYPE_NOTE[st.type]; markIcons(); redraw();
+      };
+      $('#sw', sh).onclick = e => { const b = e.target.closest('[data-slot]'); if (!b) return; st.slot = +b.dataset.slot; $$('[data-slot]', sh).forEach(x => x.classList.toggle('on', x === b)); redraw(); };
+      $('#aIcons', sh).onclick = e => { const b = e.target.closest('[data-ic]'); if (!b) return; st.icon = b.dataset.ic; markIcons(); redraw(); };
       $('#aSave', sh).onclick = () => {
-        const name = $('#aName', sh).value.trim(); if (!name) { shake($('#aName', sh)); return toast('Adj meg egy nevet.'); }
+        const name = $('#aName', sh).value.trim();
+        if (!name) { shake($('#aName', sh)); $('#aName', sh).focus(); return toast('Adj meg egy nevet.'); }
         const o = parseAmount($('#aOpen', sh).value || '0');
-        const rec = Object.assign(a || { id: 'acc_' + uid() }, { name, type: st.type, currency: $('#aCur', sh).value, opening: isFinite(o) ? o : 0, slot: st.slot });
-        if (!editing) S.accounts.push(rec);
-        UI.carIdx = null; save(); api.close(); detailApi && detailApi.close(true); refresh(); toast('Számla mentve');
-        if (rec.currency !== 'HUF') fetchRates().then(ch => ch && refresh());
+        const fields = { name, type: st.type, currency: $('#aCur', sh).value, opening: isFinite(o) ? o : 0, slot: st.slot, icon: st.icon };
+        if (editing) Object.assign(a, fields);
+        else { const rec = { id: 'acc_' + uid(), ...fields }; S.accounts.push(rec); UI.focusAcc = rec.id; }
+        save(); api.close(undefined, { plain: true }); detailApi && detailApi.close(true); refresh();
+        toast(editing ? 'Számla mentve' : 'Számla hozzáadva');
+        if (fields.currency !== 'HUF') fetchRates().then(ch => ch && refresh());
       };
       const del = $('#aDel', sh);
-      if (del) del.onclick = async () => {
-        const n = S.transactions.filter(t => t.accountId === a.id || t.toAccountId === a.id).length;
-        if (!await confirmDialog({ title: 'Számla törlése', text: n ? `A számlához tartozó ${n} tétel és az ismétlődő elemei is törlődnek.` : 'A számla törlődik.', ok: 'Törlés', danger: true })) return;
-        S.accounts = S.accounts.filter(x => x.id !== a.id);
-        S.transactions = S.transactions.filter(t => t.accountId !== a.id && t.toAccountId !== a.id);
-        S.recurring = S.recurring.filter(r => r.accountId !== a.id);
-        UI.carIdx = null; save(); api.close(); detailApi && detailApi.close(true); refresh(); toast('Számla törölve');
-      };
+      if (del) del.onclick = () => { api.close(undefined, { plain: true }); setTimeout(() => openDeleteAccount(a), 200); };
     }
   });
 }
