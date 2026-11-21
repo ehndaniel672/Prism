@@ -169,7 +169,8 @@ a{color:inherit}
   -webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);
 }
 .tab-ind{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/5);border-radius:27px;
-  background:var(--thumb);box-shadow:var(--hl);transform:translateX(calc(var(--ti,0) * 100%));will-change:transform}
+  background:var(--thumb);box-shadow:var(--hl);transform:translateX(calc(var(--ti,0) * 100%));
+  transition:transform var(--spring-dur) var(--spring)}
 .tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   font-size:10.5px;font-weight:600;color:var(--text3);letter-spacing:-.01em;transition:color .25s}
 .tab .ic{width:21px;height:21px}
@@ -464,6 +465,15 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 .rate-row{display:grid;grid-template-columns:auto 1fr 120px;gap:12px;align-items:center;padding:10px 0}
 .rate-row + .rate-row{border-top:1px solid var(--border)}
 .rate-row .input{height:42px;font-size:15px;padding:0 14px;text-align:right}
+.rate-meta{margin:2px 0 4px}
+.rate-meta div{padding:8px 2px;font-size:14px}
+.rate-status{min-height:20px;font-size:13px;font-weight:600;color:var(--accent-text);padding:2px 2px 6px}
+.rate-status:empty{display:none}
+.rate-status.bad{color:var(--danger)}
+.btn.spinning .ic{animation:spin .9s linear infinite}
+.btn[disabled]{opacity:.75;cursor:progress}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){ .btn.spinning .ic{animation:none !important} }
 .cur-tag{width:46px;height:30px;border-radius:15px;display:grid;place-items:center;font-size:12.5px;font-weight:700;background:var(--tile);border:1px solid var(--border)}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
 .swatches button{width:34px;height:34px;border-radius:17px;background:var(--c);border:2px solid transparent;transition:transform .4s var(--spring)}
@@ -546,34 +556,6 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 .dialog p{color:var(--text2);font-size:14.5px;margin-bottom:18px}
 .dialog .btn-row .btn{flex:1}
 
-/* ---------- Rolling numbers ---------- */
-.num{display:inline-flex;vertical-align:top;white-space:pre}
-.num .od,.num .oc{display:inline-block;height:1.15em;line-height:1.15em}
-.num .od{overflow:hidden}
-.num .os{display:block;transition:transform .9s cubic-bezier(.2,1.14,.36,1);will-change:transform}
-.num .os > span{display:block;height:1.15em;text-align:center}
-.num-fade{animation:fadeIn .3s ease both}
-
-/* ---------- Add button morph ---------- */
-.add-btn.morph-src{opacity:0 !important;transition:none !important}
-.sheet > :not(.skin){position:relative}
-.skin{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
-.skin-p{background:var(--panel-2);border:1px solid var(--border);border-bottom:0;box-shadow:var(--hl), 0 -20px 50px -20px rgba(0,0,0,.6);opacity:0;transition:opacity .22s ease}
-.skin-a{background:linear-gradient(135deg,var(--accent-a),var(--accent-b));box-shadow:0 12px 30px -8px rgba(140,120,255,.65);opacity:1;transition:opacity .34s ease .1s}
-.layer.morph .sheet{background:transparent;border-color:transparent;box-shadow:none}
-.layer.morph .sheet > :not(.skin){opacity:0;transition:opacity .2s ease}
-.layer.morph-in .skin-p{opacity:1}
-.layer.morph-in .skin-a{opacity:0}
-.layer.morph-in .sheet > :not(.skin){opacity:1;transition:opacity .3s ease .16s}
-.layer.morph-out .skin-p{opacity:1}
-.layer.morph-out .skin-a{opacity:1;transition:opacity .24s ease .1s}
-.layer.morph-out .sheet > :not(.skin){opacity:0;transition:opacity .14s ease}
-@media (min-width: 700px){ .skin-p{border-bottom:1px solid var(--border)} }
-/* reduced motion: sheets simply fade */
-.layer.rm .sheet{transform:none !important;opacity:0;transition:opacity .22s ease !important}
-.layer.rm.open .sheet{opacity:1}
-.layer.rm .backdrop{transition:opacity .22s ease !important}
-
 /* ---------- Motion ---------- */
 .page-in{animation:pageIn .5s var(--ease-out) both}
 @keyframes pageIn{from{opacity:0;transform:translateY(10px)}}
@@ -589,7 +571,6 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-delay:0s !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
   .draw{stroke-dashoffset:0}
-  .num-fade{animation-duration:.3s !important}
 }
 
 </style>
@@ -772,26 +753,42 @@ function rate(cur) {
 }
 const toHUF = (amount, cur) => amount * rate(cur);
 let rateStatus = 'idle'; // idle | loading | ok | offline
+let rateResult = null;    // outcome of the last check: 'new' | 'same' | 'fail'
+// S.rates.date      = the date the rates were published for (the rate's own date)
+// S.rates.checkedAt = when the app last successfully asked the source
+// force = true (Refresh button): skip every cache and always ask the source again
 async function fetchRates(force = false) {
-  const age = Date.now() - (S.rates?.fetchedAt || 0);
+  const age = Date.now() - (S.rates?.checkedAt || S.rates?.fetchedAt || 0);
   if (!force && S.rates?.source === 'ecb' && age < 6 * 3600e3) { rateStatus = 'ok'; return false; }
   rateStatus = 'loading';
-  const q = 'from=EUR&to=HUF,USD,GBP,CHF,CZK,PLN,RON';
+  const q = `from=EUR&to=HUF,USD,GBP,CHF,CZK,PLN,RON&_=${Date.now()}`; // cache-buster
   const urls = [`https://api.frankfurter.dev/v1/latest?${q}`, `https://api.frankfurter.app/latest?${q}`];
+  const prev = S.rates || {};
   for (const u of urls) {
     try {
       const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
-      const res = await fetch(u, { signal: ctl.signal }); clearTimeout(t);
+      const res = await fetch(u, { signal: ctl.signal, cache: 'no-store' }); clearTimeout(t);
       if (!res.ok) continue;
       const j = await res.json();
       if (!j?.rates?.HUF) continue;
-      S.rates = { base: 'EUR', date: j.date, fetchedAt: Date.now(), source: 'ecb', rates: j.rates };
-      save(); rateStatus = 'ok'; return true;
+      const changed = prev.source !== 'ecb' || prev.date !== j.date || JSON.stringify(prev.rates) !== JSON.stringify(j.rates);
+      const now = Date.now();
+      S.rates = { base: 'EUR', date: j.date, fetchedAt: changed ? now : (prev.fetchedAt || now), checkedAt: now, source: 'ecb', rates: j.rates };
+      save(); rateStatus = 'ok';
+      rateResult = force ? (changed ? 'new' : 'same') : null; // only report on a manual refresh
+      return changed;
     } catch (e) { /* try next */ }
   }
-  rateStatus = 'offline';
+  rateStatus = 'offline'; rateResult = 'fail';
   return false;
 }
+function fmtCheckTime(ts) {
+  if (!ts) return 'még nem volt';
+  const d = new Date(ts), s = iso(d), hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const n = diffDays(s, today());
+  return n === 0 ? `ma ${hm}` : n === 1 ? `tegnap ${hm}` : `${fmtDate(s)} ${hm}`;
+}
+const fmtRateDate = s => `${fmtDate(s)}, ${weekday(s)}`;
 
 /* ---------- Recurring schedule ---------- */
 function stepDate(s, cycle, anchor) {
@@ -1106,127 +1103,6 @@ function sampleData() {
 }
 
 /* =========================================================
-   Extra polish: rolling numbers, liquid tab bar,
-   scroll depth (parallax) and haptics
-   ========================================================= */
-
-/* ---------- Haptics (Vibration API; silently skipped where unsupported, e.g. iPhone) ---------- */
-function haptic(pattern = 10) {
-  try {
-    if (typeof navigator.vibrate !== 'function') return;
-    if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
-    navigator.vibrate(pattern);
-  } catch (_) { /* ignore */ }
-}
-
-/* ---------- Rolling (odometer) numbers ---------- */
-const ODO_STRIP = '<span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>';
-function odoBuild(el, text, startText) {
-  // Build columns; digits start at the right-aligned digit of startText (or 0)
-  const start = startText ? [...startText] : [];
-  const chars = [...text];
-  const off = start.length - chars.length;
-  el.textContent = '';
-  const sr = document.createElement('span'); sr.className = 'sr'; sr.textContent = text; el.append(sr);
-  el._odoSr = sr;
-  const cols = [];
-  chars.forEach((ch, i) => {
-    if (/\d/.test(ch)) {
-      const d = document.createElement('span'); d.className = 'od'; d.setAttribute('aria-hidden', 'true');
-      const s = document.createElement('span'); s.className = 'os'; s.innerHTML = ODO_STRIP;
-      const sc = start[i + off];
-      s.style.transform = `translateY(${-(/\d/.test(sc || '') ? +sc : 0) * 10}%)`;
-      d.append(s); el.append(d); cols.push(s);
-    } else {
-      const c = document.createElement('span'); c.className = 'oc'; c.setAttribute('aria-hidden', 'true'); c.textContent = ch; el.append(c);
-    }
-  });
-  el._odoShape = text.replace(/\d/g, 'd');
-  el._odoCols = cols;
-}
-function odoRoll(el, text, fromText) {
-  if (reduced()) {
-    // Reduced motion: no rolling, just a quick fade when the value changes
-    el.textContent = text; el._odoShape = null;
-    if (fromText != null && fromText !== text) { el.classList.remove('num-fade'); void el.offsetWidth; el.classList.add('num-fade'); }
-    return;
-  }
-  const shape = text.replace(/\d/g, 'd');
-  if (el._odoShape !== shape) {
-    odoBuild(el, text, fromText);
-    void el.offsetWidth; // commit start positions before rolling
-  }
-  el._odoSr.textContent = text;
-  const digits = [...text].filter(c => /\d/.test(c));
-  const n = digits.length;
-  el._odoCols.forEach((s, i) => {
-    const fromRight = n - 1 - i;
-    s.style.transitionDelay = `${fromRight * 28}ms`;
-    s.style.transform = `translateY(${-digits[i] * 10}%)`;
-  });
-}
-
-/* ---------- Liquid tab bar indicator ---------- */
-let tabAnim = null, tabPrev = null;
-function moveTabIndicator(to) {
-  const ind = $('#tabbar .tab-ind'); if (!ind) return;
-  const from = tabPrev; tabPrev = to;
-  ind.style.setProperty('--ti', to);
-  if (from == null || from === to) return;
-  tabAnim && tabAnim.cancel();
-  if (reduced()) {
-    tabAnim = ind.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
-    return;
-  }
-  // Keyframes described by the drop's left/right edges (in tab units); the leading
-  // edge runs ahead, the trailing edge catches up, then it settles with a small wobble.
-  const dir = Math.sign(to - from), dist = Math.abs(to - from);
-  const edges = [
-    [from, from + 1, 1, 0],
-    dir > 0 ? [from + .18 * dist, from + 1 + .72 * dist, .86, .32] : [from - .72 * dist, from + 1 - .18 * dist, .86, .32],
-    dir > 0 ? [to + .05, to + 1 + .06, 1.05, .74] : [to - .06, to + 1 - .05, 1.05, .74],
-    [to - .015 * dir, to + 1 - .015 * dir, .985, .88],
-    [to, to + 1, 1, 1],
-  ];
-  const kf = edges.map(([L, R, sy, offset]) => ({
-    transform: `translateX(${(((L + R) / 2) - .5) * 100}%) scale(${(R - L).toFixed(3)}, ${sy})`,
-    offset,
-  }));
-  tabAnim = ind.animate(kf, { duration: 520 + dist * 45, easing: 'cubic-bezier(.3,.6,.3,1)' });
-}
-
-/* ---------- Depth while scrolling (subtle parallax) ---------- */
-const PX = { els: [], raf: 0, t: 0 };
-function parallaxScan() {
-  PX.els.forEach(p => p.el.style.translate = '');
-  PX.els = [];
-  if (reduced()) return;
-  const vh = window.innerHeight;
-  const amps = [5, 9, 6, 11];
-  let i = 0;
-  for (const el of $$('#page .rise')) {
-    if (el.matches('.page-h, .dash-head')) continue;
-    const r = el.getBoundingClientRect();
-    if (!r.height || r.height > vh * .85) continue; // long lists stay put
-    PX.els.push({ el, top: r.top + window.scrollY, h: r.height, amp: amps[i++ % amps.length] });
-  }
-  parallaxTick();
-}
-function parallaxTick() {
-  PX.raf = 0;
-  const vh = window.innerHeight, sy = window.scrollY;
-  for (const p of PX.els) {
-    const t = clamp((p.top + p.h / 2 - sy - vh / 2) / vh, -1, 1);
-    p.el.style.translate = `0 ${(t * p.amp).toFixed(2)}px`;
-  }
-}
-function parallaxRescanSoon(ms = 120) { clearTimeout(PX.t); PX.t = setTimeout(parallaxScan, ms); }
-window.addEventListener('scroll', () => { if (PX.els.length && !PX.raf) PX.raf = requestAnimationFrame(parallaxTick); }, { passive: true });
-window.addEventListener('resize', () => parallaxRescanSoon(150));
-if (window.ResizeObserver) new ResizeObserver(() => parallaxRescanSoon()).observe(document.getElementById('page'));
-RM.addEventListener?.('change', () => parallaxScan());
-
-/* =========================================================
    UI toolkit: springs, counters, sheets, detail, toasts
    ========================================================= */
 
@@ -1264,15 +1140,13 @@ const NUMS = {};
 function numEl(key, value, cur = 'HUF', o = {}) {
   return `<span class="num" data-k="${key}" data-v="${value}" data-c="${cur}"${o.sign ? ' data-s="1"' : ''}>${money(value, cur, o)}</span>`;
 }
-// Numbers roll digit by digit (odometer) when they first appear in the session or change
-function runCounters(root) {
+function runCounters(root, fromZero) {
   $$('.num', root).forEach(el => {
     const k = el.dataset.k, to = +el.dataset.v, cur = el.dataset.c, sign = !!el.dataset.s;
-    const text = money(to, cur, { sign });
-    const had = k in NUMS, from = NUMS[k];
+    const from = NUMS[k] ?? (fromZero ? 0 : to);
     NUMS[k] = to;
-    if (had && Math.abs(from - to) < .005) return;
-    odoRoll(el, text, had ? money(from, cur, { sign }) : text.replace(/\d/g, '0'));
+    if (Math.abs(from - to) < .005 || reduced()) { el.textContent = money(to, cur, { sign }); return; }
+    tween(fromZero ? 900 : 650, p => { el.textContent = money(from + (to - from) * p, cur, { sign }); });
   });
 }
 
@@ -1321,8 +1195,7 @@ function attachSwipeDown(panel, handleEls, scroller, onClose, onProgress) {
   }));
 }
 
-// from: an element (the "+ Hozzáadás" pill) the sheet grows out of and shrinks back into
-function openSheet({ title, body, onMount, onClose, cls = '', from = null }) {
+function openSheet({ title, body, onMount, onClose, cls = '' }) {
   const layer = document.createElement('div'); layer.className = 'layer';
   layer.innerHTML = `<div class="backdrop"></div>
     <section class="sheet ${cls}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
@@ -1330,52 +1203,19 @@ function openSheet({ title, body, onMount, onClose, cls = '', from = null }) {
       <div class="sheet-h"><h2>${esc(title)}</h2><button class="icon-btn" data-close aria-label="Bezárás">${icon('x')}</button></div>
       <div class="sheet-b">${body}</div>
     </section>`;
-  if (reduced()) layer.classList.add('rm');
-  const sheet = $('.sheet', layer), bd = $('.backdrop', layer), sb = $('.sheet-b', layer);
-  const visible = el => !!el && el.isConnected && el.getBoundingClientRect().width > 0;
-  const morph = !reduced() && visible(from);
-  if (morph) { // set the start state before the sheet is ever styled, so content fades in from 0
-    layer.classList.add('morph');
-    sheet.insertAdjacentHTML('afterbegin', '<div class="skin skin-p"></div><div class="skin skin-a"></div>');
-    sheet.style.transition = 'none';
-  }
   $('#layers').append(layer); lockBody();
-  // transform that maps the sheet's layout box onto the source element's box
-  const toSource = () => {
-    const r = from.getBoundingClientRect();
-    const W = sheet.offsetWidth, H = sheet.offsetHeight, L = sheet.offsetLeft, T = sheet.offsetTop;
-    const sx = r.width / W, sy = r.height / H;
-    $('.skin-a', sheet).style.borderRadius = `${(r.height / 2 / sx).toFixed(1)}px / ${(r.height / 2 / sy).toFixed(1)}px`;
-    return `translate(${(r.left - L).toFixed(1)}px, ${(r.top - T).toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
-  };
+  const sheet = $('.sheet', layer), bd = $('.backdrop', layer), sb = $('.sheet-b', layer);
   let closed = false;
   const api = {
-    el: sheet, layer, morph,
+    el: sheet, layer,
     close(fromDy) {
       if (closed) return; closed = true;
-      document.removeEventListener('keydown', onKey);
-      const finish = () => { layer.remove(); lockBody(); onClose && onClose(); };
-      if (morph && visible(from) && !reduced()) {
-        // shrink back into the add button
-        layer.classList.remove('open', 'morph-in'); layer.classList.add('morph-out');
-        sheet.classList.remove('dragging');
-        sheet.style.transformOrigin = '0 0';
-        sheet.style.transition = 'transform .44s cubic-bezier(.3,.9,.25,1)';
-        sheet.style.transform = toSource();
-        setTimeout(() => {
-          from.style.transition = 'none';
-          from.classList.remove('morph-src');
-          void from.offsetWidth; from.style.transition = '';
-          from.animate([{ transform: 'scale(1.06, .9)' }, { transform: 'scale(.97, 1.03)', offset: .55 }, { transform: 'none' }], { duration: 420, easing: 'ease-out' });
-          finish();
-        }, 430);
-        return;
-      }
-      if (from) from.classList.remove('morph-src');
-      sheet.style.transition = ''; layer.classList.remove('open', 'morph-in');
+      sheet.style.transition = ''; layer.classList.remove('open');
       sheet.style.transform = '';
-      if (fromDy && !reduced()) { sheet.style.transform = `translateY(${fromDy}px)`; requestAnimationFrame(() => { sheet.style.transform = ''; }); }
-      setTimeout(finish, reduced() ? 240 : 380);
+      if (fromDy) { sheet.style.transform = `translateY(${fromDy}px)`; requestAnimationFrame(() => { sheet.style.transform = ''; }); }
+      const done = () => { layer.remove(); lockBody(); onClose && onClose(); };
+      reduced() ? done() : setTimeout(done, 380);
+      document.removeEventListener('keydown', onKey);
     }
   };
   const onKey = e => { if (e.key === 'Escape') api.close(); };
@@ -1384,20 +1224,8 @@ function openSheet({ title, body, onMount, onClose, cls = '', from = null }) {
   $('[data-close]', layer).onclick = () => api.close();
   attachSwipeDown(sheet, [$('.grab', layer), $('.sheet-h', layer)], sb, dy => api.close(dy), dy => { bd.style.opacity = String(clamp(1 - dy / 400, .2, 1)); });
   onMount && onMount(sheet, api);
-  if (morph) {
-    sheet.style.transformOrigin = '0 0';
-    sheet.style.transform = toSource();
-    from.classList.add('morph-src');
-    sheet.getBoundingClientRect();
-    requestAnimationFrame(() => {
-      sheet.style.transition = 'transform var(--spring-dur) var(--spring)';
-      sheet.style.transform = 'none';
-      layer.classList.add('open', 'morph-in');
-    });
-  } else {
-    sheet.getBoundingClientRect();
-    requestAnimationFrame(() => layer.classList.add('open'));
-  }
+  sheet.getBoundingClientRect();
+  requestAnimationFrame(() => layer.classList.add('open'));
   return api;
 }
 
@@ -1553,7 +1381,7 @@ function buildNav() {
 function updateNav() {
   const i = ORDER.indexOf(route);
   $$('#tabbar .tab, #sideNav button').forEach(b => { const on = b.dataset.go === route; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
-  moveTabIndicator(i);
+  $('#tabbar .tab-ind').style.setProperty('--ti', i);
   $('#fab').classList.toggle('hide', route === 'settings');
 }
 function go(p) { if (location.hash !== '#/' + p) location.hash = '#/' + p; else renderPage(true); }
@@ -1565,15 +1393,14 @@ function renderPage(enter) {
   if (enter) { detailApi && detailApi.close(true); root.className = 'entering'; window.scrollTo(0, 0); }
   RENDER[route](root, enter);
   updateNav();
-  if (enter) { clearTimeout(renderPage.t); renderPage.t = setTimeout(() => { root.classList.remove('entering'); parallaxScan(); }, 1500); }
-  parallaxRescanSoon(enter ? 950 : 60);
+  if (enter) { clearTimeout(renderPage.t); renderPage.t = setTimeout(() => root.classList.remove('entering'), 1500); }
   document.title = route === 'dashboard' ? 'Prism' : `${PAGES[route].label} · Prism`;
 }
 function refresh() { (UPDATE[route] || (() => RENDER[route]($('#page'), false)))(); }
 
 document.addEventListener('click', e => {
   const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); go(g.dataset.go); return; }
-  const a = e.target.closest('[data-action="add"]'); if (a) { openTxSheet({ from: a }); return; }
+  const a = e.target.closest('[data-action="add"]'); if (a) { openTxSheet({}); return; }
 });
 
 /* ---------------- Dashboard ---------------- */
@@ -1664,19 +1491,7 @@ function setupCarousel(items, keep) {
   const toIdx = i => car.scrollTo({ left: offsetFor(i), behavior: reduced() ? 'auto' : 'smooth' });
   if (!car._bound) {
     car._bound = true;
-    let raf = 0, settleT = 0;
-    // a light haptic tap when a card snaps into the centre after the user swiped
-    const settle = () => {
-      if (!car.isConnected) return;
-      if (car._user && UI.carIdx !== car._snapIdx) haptic(8);
-      car._snapIdx = UI.carIdx; car._user = false;
-    };
-    ['touchstart', 'pointerdown', 'wheel'].forEach(ev => car.addEventListener(ev, () => { car._user = true; }, { passive: true }));
-    if ('onscrollend' in window) car.addEventListener('scrollend', settle);
-    car.addEventListener('scroll', () => {
-      if (!raf) raf = requestAnimationFrame(() => { raf = 0; car._update && car._update(); });
-      if (!('onscrollend' in window)) { clearTimeout(settleT); settleT = setTimeout(settle, 140); }
-    }, { passive: true });
+    let raf = 0; car.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; car._update && car._update(); }); }, { passive: true });
     // mouse drag for desktop
     let x0 = 0, s0 = 0, down = false;
     car.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; car._moved = false; x0 = e.clientX; s0 = car.scrollLeft; });
@@ -1692,12 +1507,11 @@ function setupCarousel(items, keep) {
   car._update = update; car._toIdx = toIdx; car._offsetFor = offsetFor;
   car.scrollLeft = offsetFor(clamp(UI.carIdx, 0, slots.length - 1));
   update();
-  car._snapIdx = UI.carIdx;
   slots.forEach((s, i) => s.onclick = () => {
     if (car._moved) { car._moved = false; return; }
-    if (i !== UI.carIdx) { car._user = true; toIdx(i); } else openAccDetail(items[i], s.firstElementChild);
+    if (i !== UI.carIdx) toIdx(i); else openAccDetail(items[i], s.firstElementChild);
   });
-  dotEls.forEach((d, i) => d.onclick = () => { car._user = true; toIdx(i); });
+  dotEls.forEach((d, i) => d.onclick = () => toIdx(i));
 }
 
 function sparkData(key) {
@@ -1911,7 +1725,7 @@ function openFreeDetail(el) {
 }
 
 /* ---------------- Quick add / edit sheet ---------------- */
-function openTxSheet({ tx = null, type = null, from = null }) {
+function openTxSheet({ tx = null, type = null }) {
   const editing = !!tx;
   const st = tx ? { ...tx } : { type: type || 'expense', amount: '', accountId: S.accounts.find(a => a.type === 'card')?.id || S.accounts[0]?.id, toAccountId: null, categoryId: null, date: today(), note: '' };
   if (!S.accounts.length) { toast('Előbb hozz létre egy számlát a Beállításokban.'); return; }
@@ -1929,7 +1743,7 @@ function openTxSheet({ tx = null, type = null, from = null }) {
     <div class="field"><span>Megjegyzés</span><input class="input" id="note" maxlength="80" placeholder="pl. Lidl, ebéd, ajándék…" value="${esc(st.note || '')}"></div>
     <div class="sheet-foot">${editing ? `<button class="btn danger" id="del" aria-label="Törlés">${icon('trash-2')}</button>` : ''}<button class="btn primary" id="saveTx">${editing ? 'Mentés' : 'Hozzáadás'}</button></div>`;
   openSheet({
-    title: editing ? 'Tétel szerkesztése' : 'Új tétel', body, from,
+    title: editing ? 'Tétel szerkesztése' : 'Új tétel', body,
     onMount(sh, api) {
       const amt = $('#amt', sh);
       const chips = (list, sel, attr) => list.map(a => `<button class="chip ${a.id === sel ? 'on' : ''}" data-${attr}="${a.id}" style="--c:${tintColor(a.slot)}">${`<span class="cico" style="${cVars(a.slot)}">${icon(a.icon || ACC_ICON[a.type])}</span>`}${esc(a.name)}${a.currency && a.currency !== 'HUF' ? ` <small class="muted">${a.currency}</small>` : ''}</button>`).join('');
@@ -1984,7 +1798,7 @@ function openTxSheet({ tx = null, type = null, from = null }) {
       });
       $('#toAmt', sh).addEventListener('input', () => { toTouched = true; });
       draw();
-      if (!editing) setTimeout(() => amt.focus({ preventScroll: true }), reduced() ? 0 : api.morph ? 420 : 60);
+      if (!editing) setTimeout(() => amt.focus({ preventScroll: true }), reduced() ? 0 : 60);
       $('#saveTx', sh).onclick = () => {
         const v = parseAmount(amt.value);
         if (!(v > 0)) { amt.focus(); shake(amt.closest('.amount-wrap')); toast('Adj meg egy összeget.'); return; }
@@ -1998,7 +1812,7 @@ function openTxSheet({ tx = null, type = null, from = null }) {
         }
         if (editing) S.transactions[S.transactions.findIndex(x => x.id === tx.id)] = rec; else S.transactions.push(rec);
         UI.lastAdded = rec.id;
-        save(); haptic(14); api.close(); refresh();
+        save(); api.close(); refresh();
         toast(editing ? 'Módosítás mentve' : rec.date > today() ? 'Tervezett tétel hozzáadva' : 'Tétel hozzáadva');
       };
       const del = $('#del', sh);
@@ -2571,7 +2385,7 @@ function openRecSheet(r, kind) {
         const rec = Object.assign(r || { id: 'r_' + uid(), kind, status: 'active', createdAt: today() }, { name, amount: v, accountId: st.accountId, categoryId: st.categoryId, cycle: st.cycle, nextDate: nd, anchor: +nd.slice(8), trialEnds, icon: st.icon });
         if (!editing) S.recurring.push(rec);
         RC.moved = rec.id;
-        postDueRecurring(); save(); haptic(14); api.close(); refresh();
+        postDueRecurring(); save(); api.close(); refresh();
         toast(editing ? 'Módosítás mentve' : 'Hozzáadva');
       };
       const del = $('#rDel', sh);
@@ -2589,8 +2403,14 @@ const SETC = { catKind: 'expense' };
 RENDER.settings = root => {
   const usedCur = [...new Set(['EUR', 'USD', ...S.accounts.map(a => a.currency).filter(c => c !== 'HUF')])];
   const rs = S.rates || {};
-  const srcL = rs.source === 'ecb' ? `Európai Központi Bank (Frankfurter) · ${fmtDate(rs.date)}` : 'Beépített becslés – még nem sikerült letölteni';
-  const stL = { loading: 'Frissítés…', offline: 'Offline – a legutóbb mentett árfolyamot használjuk', ok: '', idle: '' }[rateStatus];
+  const isEcb = rs.source === 'ecb';
+  const srcL = isEcb ? 'Forrás: Európai Központi Bank (Frankfurter API)' : 'Beépített becslés – még nem sikerült letölteni';
+  const loading = rateStatus === 'loading';
+  const stL = loading ? 'Frissítés…'
+    : rateResult === 'same' ? `Naprakész – a legfrissebb árfolyam dátuma: ${fmtRateDate(rs.date)}`
+    : rateResult === 'new' ? 'Új árfolyamok betöltve'
+    : rateResult === 'fail' ? 'Nem sikerült elérni a forrást, a legutóbb mentett árfolyamot használjuk'
+    : '';
   root.innerHTML = `
     <header class="page-h rise" style="--i:0"><div><h1>Beállítások</h1><div class="sub">Az adatok csak ebben a böngészőben tárolódnak</div></div></header>
     <div class="stack">
@@ -2604,10 +2424,15 @@ RENDER.settings = root => {
       ${segHTML('ckind', [['expense', 'Kiadás'], ['income', 'Bevétel']], SETC.catKind)}
       <div class="chips" id="catChips" style="margin-top:12px"></div></section>
 
-    <section class="glass card rise" style="--i:4"><div class="card-h"><div><div class="card-t">Árfolyamok</div><div class="card-s">${esc(srcL)}</div></div><button class="btn sm" id="rateRefresh">${icon('refresh-cw')}Frissítés</button></div>
-      ${stL ? `<div class="card-s" style="margin-bottom:6px;color:var(--accent-text)">${stL}</div>` : ''}
+    <section class="glass card rise" style="--i:4"><div class="card-h"><div><div class="card-t">Árfolyamok</div><div class="card-s">${esc(srcL)}</div></div><button class="btn sm ${loading ? 'spinning' : ''}" id="rateRefresh" ${loading ? 'disabled aria-busy="true"' : ''}>${icon('refresh-cw')}${loading ? 'Frissítés…' : 'Frissítés'}</button></div>
+      <div class="kv rate-meta">
+        <div><span>Árfolyam dátuma</span><b>${isEcb ? fmtRateDate(rs.date) : 'beépített becslés'}</b></div>
+        <div><span>Utolsó ellenőrzés</span><b>${fmtCheckTime(rs.checkedAt || (isEcb ? rs.fetchedAt : 0))}</b></div>
+      </div>
+      <div class="rate-status ${rateResult === 'fail' && !loading ? 'bad' : ''}" role="status" aria-live="polite">${stL ? esc(stL) : ''}</div>
       ${usedCur.map(c => `<div class="rate-row"><span class="cur-tag">${c}</span><div><div style="font-weight:600">1 ${c} = ${fmtNum(rate(c), 2)} Ft</div><div class="card-s">${S.rateOverrides[c] ? `Kézi érték · EKB: ${fmtNum(autoRate(c), 2)} Ft` : 'Automatikus (EKB)'}</div></div><input class="input" inputmode="decimal" data-ov="${c}" placeholder="Kézi" value="${S.rateOverrides[c] ? fmtNum(S.rateOverrides[c], 2) : ''}" aria-label="${c} kézi árfolyam"></div>`).join('')}
-      <div class="card-s" style="margin-top:8px">A kézi mező kitöltésével felülírhatod az árfolyamot; üresen hagyva az EKB napi árfolyama érvényes.</div></section>
+      <div class="card-s" style="margin-top:8px">A kézi mező kitöltésével felülírhatod az árfolyamot; üresen hagyva az EKB napi árfolyama érvényes.</div>
+      <div class="card-s" style="margin-top:6px">A jegybankok hétvégén és ünnepnapokon nem tesznek közzé árfolyamot – ilyenkor az utolsó munkanap árfolyama a legfrissebb. Az EKB munkanapokon kb. 16:00-kor (magyar idő) frissít.</div></section>
 
     <section class="glass card rise" style="--i:5"><div class="card-h"><div class="card-t">Adatok</div></div>
       <div class="btn-row">
@@ -2635,10 +2460,11 @@ RENDER.settings = root => {
   $('#accNew').onclick = () => openAccountSheet(null);
   $('#catNew').onclick = () => openCategorySheet(null);
   $('#rateRefresh').onclick = async () => {
+    if (rateStatus === 'loading') return;
     rateStatus = 'loading'; RENDER.settings($('#page'), false);
-    const ok = await fetchRates(true);
-    RENDER.settings($('#page'), false);
-    toast(ok ? 'Árfolyamok frissítve' : 'Nem sikerült letölteni – a mentett árfolyam marad');
+    const minSpin = new Promise(r => setTimeout(r, 450)); // keep the spinner visible long enough to notice
+    await Promise.all([fetchRates(true), minSpin]);
+    if (route === 'settings') RENDER.settings($('#page'), false);
   };
   $$('[data-ov]', root).forEach(inp => inp.onchange = () => {
     const v = parseAmount(inp.value); const c = inp.dataset.ov;
